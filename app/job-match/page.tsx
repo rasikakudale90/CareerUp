@@ -253,25 +253,29 @@ export default function JobMatchPage() {
                     </div>
 
                     <div>
-                      <span className="text-[10px] font-bold uppercase text-amber-500 dark:text-amber-400 block mb-1.5 flex items-center justify-between">
-                        <span className="flex items-center gap-1">
-                          <XCircle className="h-3 w-3 text-red-500" />
-                          <span>Missing Bridge Requirements ({actuallyMissing.length})</span>
-                        </span>
-                        {actuallyMissing.length > 0 && (
-                          <span className="text-[10px] text-[var(--text-muted)] lowercase font-normal">
-                            (click to bridge)
-                          </span>
-                        )}
-                      </span>
-                      
                       {actuallyMissing.length === 0 ? (
-                        <div className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1 py-1">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                          <span>All requirements fully bridged &amp; verified (98%+ Match)!</span>
+                        <div>
+                          <span className="text-[10px] font-bold uppercase text-emerald-500 block mb-1.5 flex items-center gap-1">
+                            <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                            <span>Zero Missing Requirements (100% Covered)</span>
+                          </span>
+                          <div className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                            <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
+                            <span>All hiring requirements are fully satisfied!</span>
+                          </div>
                         </div>
                       ) : (
-                        <div className="flex flex-wrap gap-1.5">
+                        <div>
+                          <span className="text-[10px] font-bold uppercase text-amber-500 dark:text-amber-400 block mb-1.5 flex items-center justify-between">
+                            <span className="flex items-center gap-1">
+                              <XCircle className="h-3 w-3 text-red-500" />
+                              <span>Missing Bridge Requirements ({actuallyMissing.length})</span>
+                            </span>
+                            <span className="text-[10px] text-[var(--text-muted)] lowercase font-normal">
+                              (click to bridge)
+                            </span>
+                          </span>
+                          <div className="flex flex-wrap gap-1.5">
                           {actuallyMissing.map((sk) => (
                             <button
                               key={sk}
