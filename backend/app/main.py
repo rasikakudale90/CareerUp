@@ -28,6 +28,9 @@ app.add_middleware(
 # Ensure upload directory exists
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 
+from backend.app.api.auth import router as auth_router
+app.include_router(auth_router, prefix="/api/v1")
+
 @app.get("/api/health", tags=["Health"])
 def health_check():
     return {
