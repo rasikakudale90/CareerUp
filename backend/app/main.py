@@ -49,6 +49,7 @@ app.include_router(jobs_router, prefix="/api/v1")
 app.include_router(history_router, prefix="/api/v1")
 
 @app.get("/api/health", tags=["Health"])
+@app.get("/health", tags=["Health"])
 def health_check():
     return {
         "status": "online",
