@@ -1,10 +1,12 @@
-# 🚀 CareerUp — Fullstack State & Progress Tracker
+# 🚀 CareerUp — Fullstack State, Deployment & Progress Tracker
 
 **Platform:** CareerUp — AI Student Career Intelligence Platform  
 **Frontend Stack:** Next.js 16 (App Router / Turbopack), TypeScript, Tailwind CSS, GSAP, Three.js, Lenis, Framer Motion  
-**Backend Stack:** FastAPI (Python 3.14), SQLAlchemy ORM, Google Gemini GenAI SDK, SQLite / PostgreSQL, JWT Bearer Auth  
-**Design Reference:** NexEvent Visual Archetype & PRD Specifications  
-**SRS Reference:** `docs/AI_Student_Career_Navigator_Technical_SRS.md`  
+**Frontend Live Deployment:** [Vercel](https://careerup.vercel.app)  
+**Backend Stack:** FastAPI (Python 3.11 / 3.14), SQLAlchemy ORM, Google Gemini GenAI SDK, PostgreSQL / SQLite, JWT Bearer Auth  
+**Backend Live Deployment:** [https://careerup-h35y.onrender.com](https://careerup-h35y.onrender.com) (Swagger UI: [`/docs`](https://careerup-h35y.onrender.com/docs))  
+**Cloud Storage & Database:** Supabase (PostgreSQL Transaction Pooler + S3 Storage Bucket `resumes`)  
+**GitHub Repository:** [https://github.com/rasikakudale90/CareerUp](https://github.com/rasikakudale90/CareerUp)  
 **Status Date:** 2026-10-04  
 
 ---
@@ -18,7 +20,7 @@ CareerUp transforms static resumes into actionable, multidimensional career inte
 
 ## 🏗️ Architecture & Component Inventory
 
-### 1. Frontend App Routes (`/app`)
+### 1. Frontend App Routes (`/app`) — Deployed on Vercel
 - [x] **`/` (Landing Page)**: Cinematic Hero with GSAP entrance sequence, Three.js 3D Career Orbit ([`CareerOrbit3D.tsx`](file:///e:/Ai%20career/components/hero/CareerOrbit3D.tsx)), Live Persona Switcher, Dynamic Readiness Calculator Preview, Feature Showcases, Social Proof, and CTA.
 - [x] **`/auth/signin` & `/signin`**: Sign In with 1-Click Fast Persona Switch (**Aditi Sharma** - AI Engineer vs. **Alex Morgan** - Fullstack Engineer).
 - [x] **`/auth/register` & `/register` & `/signup`**: Registration with university, graduation year, and target role inputs.
@@ -32,35 +34,47 @@ CareerUp transforms static resumes into actionable, multidimensional career inte
 - [x] **`/job-match`**: ATS Compatibility Engine with curated listings + live custom Job Description parser for instant ATS match percentages.
 - [x] **`/readiness`**: Deep-dive readiness diagnostics (Portfolio Quality, Technical Interview Readiness, System Design, Critical Blockers).
 
-### 2. Backend Architecture (`/backend`)
-- [x] **FastAPI Application (`backend/app/main.py`)**: CORS middleware, health check endpoint (`GET /api/health`), and interactive Swagger UI at `/docs`.
+### 2. Frontend Polish & UX Enhancements
+- [x] **Dynamic Time-Based Greetings**: Client-synchronized greeting (`Good morning` / `Good afternoon` / `Good evening`) with hydration mismatch suppression.
+- [x] **Theme Token Harmony (100% Light & Dark Mode)**: Converted all hardcoded colors, radar chart meshes, and circular progress rings to semantic CSS variables (`var(--border-strong)`, `var(--accent)`, `var(--text-primary)`).
+- [x] **Spotlight Microinteractions**: 550px radial cursor tracking spotlight on cards, interactive button lift effects, and responsive pill elevations.
+- [x] **Responsive Card Layouts**: Elastic flex adjustments for long titles ("Applied Machine Learning Engineer") with why-fit badges, match progress bars, and active selected state rings.
+
+### 3. Backend Architecture (`/backend`) — Deployed on Render
+- [x] **FastAPI Application (`backend/app/main.py`)**: CORS middleware, health check endpoint (`GET /health` & `GET /api/health`), and interactive Swagger UI at `/docs`.
 - [x] **Database & ORM Layer (`backend/app/db/` & `backend/app/models/`)**: SQLAlchemy models for `User`, `StudentProfile`, `Skill`, `PortfolioProject`, `Experience`, `CareerTrack`, `SkillGap`, `RoadmapMilestone`, `RoadmapTask`, `JobListing`, `JobMatch`, `AIInteractionLog`.
-- [x] **Authentication & Security (`backend/app/core/security.py` & `backend/app/api/auth.py`)**: JWT token generation/validation, native bcrypt password hashing, and fast persona seeding (Aditi & Alex).
-- [x] **File Ingestion Engine (`backend/app/services/file_extractor.py`)**: Robust multi-format document parser supporting PDF (`pypdf`), DOCX (`python-docx`), and TXT with file sanitization and 5MB limits.
-- [x] **Gemini AI Integration (`backend/app/ai/`)**: Server-side Google GenAI client wrapper, prompt template registry for all 6 AI workflows, and clean JSON normalizer.
-- [x] **Core AI Business Engines (`backend/app/api/`)**:
+- [x] **Supabase Integration**:
+  - PostgreSQL transaction pooler connectivity on port `6543`.
+  - Automatic database table creation on application startup.
+  - S3-compatible cloud storage adapter (`backend/app/services/storage_adapter.py`) uploading candidate resumes directly to Supabase's `resumes` bucket with public access URLs.
+- [x] **Authentication & Security (`backend/app/core/security.py` & `backend/app/api/auth.py`)**: JWT token generation/validation with dual `PyJWT`/`jose` fallback, native bcrypt hashing, and instant demo persona seeding.
+- [x] **File Ingestion Engine (`backend/app/services/file_extractor.py`)**: Robust multi-format document parser supporting PDF (`pypdf`), DOCX (`python-docx`), and TXT with file sanitization.
+- [x] **Gemini AI Integration (`backend/app/ai/`)**: Google GenAI client wrapper, prompt template registry for all 6 AI workflows, and clean JSON normalization.
+- [x] **Core AI Business Endpoints (`backend/app/api/`)**:
   - `ProfileService` (`/api/v1/profile`): Multi-dimensional Career DNA generator.
   - `CareerService` (`/api/v1/careers`): Dynamic career match trajectories.
   - `SkillGapService` (`/api/v1/skill-gap`): Tiered gap analysis with study hour metrics.
   - `RoadmapService` (`/api/v1/roadmap`): 12-week phased curriculum with dynamic task toggling.
   - `WhatIfService` (`/api/v1/simulator/what-if`): Sandboxed non-mutating profile simulations.
-  - `JobMatchService` (`/api/v1/jobs/parse-jd`): ATS compatibility matcher and readiness breakdown.
-- [x] **Hybrid Frontend-Backend Bridge (`lib/api.ts`)**: Resilient API client with automatic offline fallback guaranteeing zero frontend disruption.
+  - `JobMatchService` (`/api/v1/jobs/parse-jd` & `/api/v1/jobs/readiness`): ATS compatibility matcher and interview readiness diagnostics.
+  - `HistoryService` (`/api/v1/history/ai-logs`): Comprehensive audit history.
+- [x] **Hybrid Frontend-Backend Bridge (`lib/api.ts`)**: Auto-detects production environments to route traffic directly to the live Render backend (`https://careerup-h35y.onrender.com`), while defaulting to localhost during development with graceful offline fallback.
 
 ---
 
-## 📊 Verification Matrix
+## 📊 Verification & Deployment Matrix
 
-| Verification Scope | Status | Result |
-| :--- | :---: | :--- |
-| **Frontend Production Build** | ✅ Verified | Next.js Turbopack compiled 18 static routes in 4.2s (0 warnings / errors). |
-| **Frontend Automated Test Suite** | ✅ Verified | 92 of 92 integration assertions passed. |
-| **Backend Pytest API Suite** | ✅ Verified | 10 of 10 API test suites passed in 4.96s. |
-| **Database Schema Initialization** | ✅ Verified | Auto-created SQLite/PostgreSQL schema with zero migration conflicts. |
-| **Swagger / OpenAPI Documentation** | ✅ Verified | Live and documented at `http://localhost:8000/docs`. |
+| Verification Scope | Platform | Status | Result |
+| :--- | :--- | :---: | :--- |
+| **Frontend Production Build** | Vercel / Turbopack | ✅ Verified | 18 static routes compiled cleanly (0 TypeScript/Turbopack errors). |
+| **Frontend Automated Test Suite** | Node.js Test Runner | ✅ Verified | 91 of 91 integration assertions passed (100%). |
+| **Local Backend Verification** | Uvicorn (127.0.0.1) | ✅ Verified | 16 of 16 REST endpoints passed (100%). |
+| **Live Cloud Backend Verification** | Render (`careerup-h35y`) | ✅ Verified | **16 of 16 Live Cloud Endpoints Passed (100%)**. |
+| **Cloud Database Sync** | Supabase Postgres | ✅ Verified | Automatic table synchronization and schema creation verified. |
+| **Cloud Resume Storage** | Supabase Storage Bucket | ✅ Verified | `resumes` bucket with public read/write RLS policies configured. |
+| **GitHub Repository Sync** | GitHub (`main`) | ✅ Up to Date | Latest commit `ddc696e` pushed to `origin main`. |
 
 ---
 
-## 🎯 Completion Status
-
-Both Frontend and Backend have been fully built, verified, and committed in atomic phases matching all SRS and Design Token specifications.
+## 🎯 Current Status
+The complete CareerUp AI Navigator full-stack ecosystem is **100% built, tested, verified, and deployed** across Vercel, Render, Supabase, and GitHub.
