@@ -147,18 +147,26 @@ export default function JobMatchPage() {
                   </div>
 
                   <div>
-                    <span className="text-[10px] font-bold uppercase text-red-500 block mb-1.5 flex items-center gap-1">
-                      <XCircle className="h-3 w-3" />
-                      <span>Missing Bridge Requirements ({job.missingSkills.length})</span>
+                    <span className="text-[10px] font-bold uppercase text-amber-500 dark:text-amber-400 block mb-1.5 flex items-center justify-between">
+                      <span className="flex items-center gap-1">
+                        <XCircle className="h-3 w-3 text-red-500" />
+                        <span>Missing Bridge Requirements ({job.missingSkills.length})</span>
+                      </span>
+                      <span className="text-[10px] text-[var(--text-muted)] lowercase font-normal">
+                        (click to bridge)
+                      </span>
                     </span>
                     <div className="flex flex-wrap gap-1.5">
                       {job.missingSkills.map((sk) => (
-                        <span
+                        <Link
                           key={sk}
-                          className="px-2 py-0.5 rounded-md bg-red-500/15 border border-red-500/30 text-red-600 dark:text-red-300 text-[11px]"
+                          href="/roadmap"
+                          className="px-2.5 py-1 rounded-md bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-600 dark:text-red-300 text-[11px] font-medium transition-all flex items-center gap-1 group/skill shadow-sm"
+                          title="Click to view roadmap tasks bridging this requirement"
                         >
-                          {sk}
-                        </span>
+                          <span>{sk}</span>
+                          <span className="text-[10px] text-red-500 group-hover/skill:translate-x-0.5 transition-transform">➔</span>
+                        </Link>
                       ))}
                     </div>
                   </div>
