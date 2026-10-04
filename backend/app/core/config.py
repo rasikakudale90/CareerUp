@@ -26,12 +26,16 @@ class Settings(BaseSettings):
         "*"
     ]
     
-    # Storage
+    # Storage & Supabase Cloud
     UPLOAD_DIR: str = os.getenv("UPLOAD_DIR", "./uploads")
     MAX_FILE_SIZE_MB: int = 5
+    SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
+    SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "")
+    SUPABASE_BUCKET_NAME: str = os.getenv("SUPABASE_BUCKET_NAME", "resumes")
 
     class Config:
         case_sensitive = True
-        env_file = ".env"
+        extra = "ignore"
+        env_file = (".env", "backend/.env")
 
 settings = Settings()

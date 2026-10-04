@@ -400,7 +400,7 @@ export default function LandingPage() {
             {/* Top Bar of Preview */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-[var(--border-color)] gap-4">
               <div>
-                <div className="text-lg sm:text-xl font-bold text-[var(--text-primary)] flex items-center gap-2">
+                <div suppressHydrationWarning className="text-lg sm:text-xl font-bold text-[var(--text-primary)] flex items-center gap-2">
                   {greeting}, {studentProfile.name.split(" ")[0]} 👋
                 </div>
                 <div className="text-xs text-[var(--text-secondary)]">Your future is full of possibilities. Let&apos;s explore.</div>
