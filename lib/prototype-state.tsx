@@ -50,6 +50,8 @@ interface PrototypeContextType {
   skillGaps: SkillGapItem[];
   roadmap: RoadmapMilestone[];
   toggleRoadmapTask: (milestoneId: string, taskId: string) => void;
+  completeAllRoadmapTasks: () => void;
+  resetRoadmapTasks: () => void;
   simulatedSkills: SimulationSkill[];
   toggleSimulatedSkill: (skillId: string) => void;
   isSimulatedSkillActive: (skillId: string) => boolean;
@@ -246,6 +248,20 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const completeAllRoadmapTasks = () => {
+    setRoadmap((prev) =>
+      prev.map((milestone) => ({
+        ...milestone,
+        status: "completed",
+        tasks: milestone.tasks.map((task) => ({ ...task, completed: true })),
+      }))
+    );
+  };
+
+  const resetRoadmapTasks = () => {
+    setRoadmap(INITIAL_ROADMAP);
+  };
+
   const toggleSimulatedSkill = (skillId: string) => {
     setActiveSimSkillIds((prev) =>
       prev.includes(skillId) ? prev.filter((id) => id !== skillId) : [...prev, skillId]
@@ -322,6 +338,8 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
         skillGaps,
         roadmap,
         toggleRoadmapTask,
+        completeAllRoadmapTasks,
+        resetRoadmapTasks,
         simulatedSkills: simulatedSkillsWithActiveState,
         toggleSimulatedSkill,
         isSimulatedSkillActive,

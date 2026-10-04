@@ -21,16 +21,19 @@ export default function RoadmapPage() {
   const {
     roadmap,
     toggleRoadmapTask,
+    completeAllRoadmapTasks,
+    resetRoadmapTasks,
     overallReadinessScore,
     completedTasksCount,
     totalTasksCount,
   } = usePrototype();
 
+  const [activePhaseFilter, setActivePhaseFilter] = useState<number | "all">("all");
   const [expandedMilestones, setExpandedMilestones] = useState<Record<string, boolean>>({
     "m-1": true,
     "m-2": true,
-    "m-3": false,
-    "m-4": false,
+    "m-3": true,
+    "m-4": true,
   });
 
   const toggleExpand = (id: string) => {
@@ -38,6 +41,10 @@ export default function RoadmapPage() {
   };
 
   const progressPercent = Math.round((completedTasksCount / totalTasksCount) * 100);
+
+  const filteredRoadmap = activePhaseFilter === "all"
+    ? roadmap
+    : roadmap.filter((m) => m.phaseNumber === activePhaseFilter);
 
   return (
     <AppShell
@@ -59,6 +66,24 @@ export default function RoadmapPage() {
               <p className="text-xs text-[var(--text-secondary)] mt-1">
                 Checking off completed tasks automatically updates your hiring readiness index and triggers live ATS recalculation.
               </p>
+
+              {/* Demo Action Buttons */}
+              <div className="flex items-center gap-2.5 mt-4">
+                <button
+                  onClick={completeAllRoadmapTasks}
+                  className="px-3.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 font-semibold text-xs transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+                >
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>Complete All Tasks (Demo 100%)</span>
+                </button>
+
+                <button
+                  onClick={resetRoadmapTasks}
+                  className="px-3.5 py-1.5 rounded-xl bg-[var(--bg-card-subtle)] hover:bg-[var(--border-color)] border border-[var(--border-color)] text-[var(--text-muted)] hover:text-[var(--text-primary)] font-semibold text-xs transition-all active:scale-95"
+                >
+                  <span>Reset Tasks</span>
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center gap-6 self-start md:self-auto bg-[var(--bg-card-subtle)] px-5 py-3 rounded-2xl border border-[var(--border-color)]">
@@ -69,7 +94,7 @@ export default function RoadmapPage() {
               <div className="h-8 w-px bg-[var(--border-color)]" />
               <div className="text-center">
                 <span className="text-[10px] text-[var(--text-muted)] uppercase font-bold block">Phases Active</span>
-                <span className="text-2xl font-bold text-emerald-500">2 / 4</span>
+                <span className="text-2xl font-bold text-emerald-500">{roadmap.filter(m => m.tasks.some(t => t.completed)).length || 1} / 4</span>
               </div>
             </div>
           </div>
@@ -83,9 +108,37 @@ export default function RoadmapPage() {
           </div>
         </div>
 
+        {/* Phase Filter Tabs */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+          <button
+            onClick={() => setActivePhaseFilter("all")}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all shrink-0 ${
+              activePhaseFilter === "all"
+                ? "bg-[var(--accent)] text-white shadow-md"
+                : "bg-[var(--bg-card)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            }`}
+          >
+            All 4 Phases ({totalTasksCount} Tasks)
+          </button>
+
+          {roadmap.map((m) => (
+            <button
+              key={m.id}
+              onClick={() => setActivePhaseFilter(m.phaseNumber)}
+              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all shrink-0 ${
+                activePhaseFilter === m.phaseNumber
+                  ? "bg-[var(--accent)] text-white shadow-md"
+                  : "bg-[var(--bg-card)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+              }`}
+            >
+              Phase {m.phaseNumber}: {m.title.split(":")[1]?.trim() || m.title}
+            </button>
+          ))}
+        </div>
+
         {/* Milestone Timeline List */}
         <div className="space-y-6">
-          {roadmap.map((milestone) => {
+          {filteredRoadmap.map((milestone) => {
             const isExpanded = !!expandedMilestones[milestone.id];
             const completedInMilestone = milestone.tasks.filter((t) => t.completed).length;
             const milestoneProgress = Math.round((completedInMilestone / milestone.tasks.length) * 100);
