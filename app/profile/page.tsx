@@ -204,6 +204,9 @@ export default function ProfilePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </SpotlightCard>
+
         {/* AI Interaction History Section */}
         <SpotlightCard className="rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] p-6 shadow-xl space-y-4">
           <div className="flex items-center justify-between">
