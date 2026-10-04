@@ -24,6 +24,7 @@ export default function DashboardPage() {
   const {
     studentProfile,
     careerPaths,
+    selectedCareerId,
     setSelectedCareerId,
     skillGaps,
     roadmap,
@@ -99,33 +100,87 @@ export default function DashboardPage() {
               </div>
 
               <div className="space-y-3">
-                {topMatches.map((career) => (
-                  <div
-                    key={career.id}
-                    onClick={() => setSelectedCareerId(career.id)}
-                    className="p-3.5 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)] hover:border-[var(--accent)] transition-all cursor-pointer group"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center text-[var(--accent)] group-hover:scale-110 transition-transform">
-                          <Compass className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <div className="text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">
-                            {career.title}
+                {topMatches.map((career) => {
+                  const isSelected = selectedCareerId === career.id;
+                  return (
+                    <div
+                      key={career.id}
+                      onClick={() => setSelectedCareerId(career.id)}
+                      className={`p-3.5 rounded-2xl bg-[var(--bg-card-subtle)] border transition-all cursor-pointer group ${
+                        isSelected
+                          ? "border-[var(--accent)] ring-1 ring-[var(--accent)]/40 bg-[var(--accent-soft)]/20 shadow-md"
+                          : "border-[var(--border-subtle)] hover:border-[var(--accent)]/60"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2.5">
+                        <div className="flex items-start gap-3 min-w-0 flex-1">
+                          <div
+                            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform ${
+                              isSelected
+                                ? "bg-[var(--accent)] text-white"
+                                : "bg-[var(--accent-soft)] text-[var(--accent)]"
+                            }`}
+                          >
+                            <Compass className="h-5 w-5" />
                           </div>
-                          <div className="text-[10px] text-[var(--text-secondary)]">{career.avgSalary}</div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors leading-snug">
+                                {career.title}
+                              </span>
+                              {isSelected && (
+                                <span className="text-[9px] px-1.5 py-0.2 rounded bg-[var(--accent)] text-white font-bold">
+                                  Selected
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">
+                              {career.avgSalary} • {career.openRolesCount} Openings
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-right shrink-0">
+                          <span
+                            className={`px-2.5 py-1 rounded-full font-bold text-xs inline-block transition-all ${
+                              career.matchScore >= 90
+                                ? "bg-emerald-500/20 border border-emerald-500/40 text-emerald-400"
+                                : career.matchScore >= 80
+                                ? "bg-[var(--accent-soft)] border border-[var(--accent)]/40 text-[var(--accent)]"
+                                : "bg-amber-500/15 border border-amber-500/30 text-amber-400"
+                            }`}
+                          >
+                            {career.matchScore}% Match
+                          </span>
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <span className="px-2.5 py-1 rounded-full bg-[var(--accent-soft)] border border-[var(--accent)]/30 text-[var(--accent)] font-bold text-xs shimmer-badge">
-                          {career.matchScore}% Match
+                      {/* Visual Match Progress Bar */}
+                      <div className="w-full bg-[var(--border-color)] h-1.5 rounded-full mt-2.5 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            career.matchScore >= 90
+                              ? "bg-emerald-500"
+                              : career.matchScore >= 80
+                              ? "bg-[var(--accent)]"
+                              : "bg-amber-500"
+                          }`}
+                          style={{ width: `${career.matchScore}%` }}
+                        />
+                      </div>
+
+                      {/* Key Match Components Tags */}
+                      <div className="flex items-center justify-between text-[10px] mt-2 text-[var(--text-secondary)] pt-1.5 border-t border-[var(--border-subtle)]">
+                        <span className="truncate pr-1">
+                          <span className="text-[var(--text-muted)]">Fit:</span> {career.whyFit?.[0]?.slice(0, 30) || career.category}...
+                        </span>
+                        <span className="shrink-0 text-amber-400/90 font-medium">
+                          Gap: {career.keyMissingSkills?.[0]?.split(" ")[0] || "Bridge"}
                         </span>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <Link
