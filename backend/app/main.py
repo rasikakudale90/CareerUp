@@ -28,6 +28,15 @@ app.add_middleware(
 # Ensure upload directory exists
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 
+# Initialize database tables automatically (SQLite or Supabase Postgres)
+try:
+    from backend.app.db.session import Base, engine
+    import backend.app.models
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"[Database Initialization Warning] {e}")
+
+
 from backend.app.api.auth import router as auth_router
 from backend.app.api.resume import router as resume_router
 from backend.app.api.profile import router as profile_router
