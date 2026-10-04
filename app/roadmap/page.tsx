@@ -199,6 +199,77 @@ export default function RoadmapPage() {
             );
           })}
         </div>
+
+        {/* 100% Roadmap Completion Celebratory Card */}
+        {progressPercent >= 100 ? (
+          <SpotlightCard className="rounded-3xl bg-gradient-to-r from-emerald-500/15 via-[var(--bg-card)] to-[var(--accent)]/15 border-2 border-emerald-500/40 p-8 shadow-2xl text-center space-y-4 animate-in zoom-in-95 duration-300">
+            <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-500 border border-emerald-500/40 flex items-center justify-center mx-auto shadow-lg">
+              <ShieldCheck className="h-8 w-8 animate-bounce" />
+            </div>
+
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-2">
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Tier-1 Industry Certification Ready</span>
+              </div>
+              <h3 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
+                🎉 Congratulations! 12-Week Roadmap 100% Completed
+              </h3>
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-xl mx-auto mt-2">
+                You have closed all critical architectural skill gaps (pgvector RAG, LangGraph agents, containerization, and capstone polish). Your profile is now benchmarked in the top 5% of candidate pools.
+              </p>
+            </div>
+
+            {/* Next Action Buttons */}
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/job-match"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-[var(--accent)] text-white font-semibold text-xs sm:text-sm hover:bg-[var(--accent-hover)] transition-all flex items-center justify-center gap-2 shadow-xl hover:scale-105"
+              >
+                <span>Launch Job &amp; ATS Matcher</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+
+              <Link
+                href="/readiness"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-[var(--bg-card-subtle)] hover:bg-[var(--border-color)] border border-[var(--border-color)] text-[var(--text-primary)] font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2"
+              >
+                <span>View Full Readiness Diagnostics</span>
+              </Link>
+
+              <Link
+                href="/what-if"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-[var(--bg-card-subtle)] hover:bg-[var(--border-color)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs sm:text-sm transition-all flex items-center justify-center gap-2"
+              >
+                <span>Simulate Next Senior Pivot</span>
+              </Link>
+            </div>
+          </SpotlightCard>
+        ) : (
+          <div className="rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center font-bold text-xs shrink-0">
+                <Sparkles className="h-4 w-4" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-[var(--text-primary)]">
+                  Next Step After Roadmap Completion:
+                </h4>
+                <p className="text-[11px] text-[var(--text-secondary)]">
+                  Once all 4 phases are completed, you unlock direct ATS Job Matching and AI Cover Letter generation.
+                </p>
+              </div>
+            </div>
+
+            <Link
+              href="/job-match"
+              className="px-4 py-2 rounded-xl bg-[var(--accent)]/15 hover:bg-[var(--accent)]/25 text-[var(--accent)] border border-[var(--accent)]/30 text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0"
+            >
+              <span>Preview Job Matches</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        )}
       </div>
     </AppShell>
   );
