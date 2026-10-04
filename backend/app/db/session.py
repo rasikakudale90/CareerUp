@@ -2,16 +2,27 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from backend.app.core.config import settings
 
-# For SQLite, enable check_same_thread=False
-connect_args = {"check_same_thread": False} if settings.DATABASE_URL.startswith("sqlite") else {}
+db_url = settings.DATABASE_URL
 
-engine = create_engine(
-    settings.DATABASE_URL,
-    connect_args=connect_args,
-    echo=False
-)
+# Normalize postgres:// to postgresql://
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+connect_args = {"check_same_thread": False} if db_url.startswith("sqlite") else {}
+
+try:
+    engine = create_engine(
+        db_url,
+        connect_args=connect_args,
+        echo=False
+    )
+    # Test connection creation
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+except Exception as e:
+    print(f"[Database Connection Warning] Failed to connect using '{db_url}': {e}. Falling back to SQLite.")
+    fallback_url = "sqlite:///./careerup.db"
+    engine = create_engine(fallback_url, connect_args={"check_same_thread": False}, echo=False)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
@@ -21,3 +32,4 @@ def get_db():
         yield db
     finally:
         db.close()
+
