@@ -1,25 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Link from "next/link";
+import gsap from "gsap";
 import {
   Sparkles,
   ArrowRight,
   Compass,
-  BarChart3,
   GitBranch,
   Wand2,
-  Briefcase,
   CheckCircle2,
-  TrendingUp,
-  ShieldCheck,
   ChevronRight,
-  ExternalLink,
-  Target,
   Zap,
-  Play,
   Users,
-  BookOpen,
   Award,
   GraduationCap,
 } from "lucide-react";
@@ -33,11 +26,49 @@ import { usePrototype } from "@/lib/prototype-state";
 
 export default function LandingPage() {
   const { studentProfile, careerPaths, overallReadinessScore, roadmap } = usePrototype();
+  const heroRef = useRef<HTMLDivElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const subheadRef = useRef<HTMLParagraphElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const metricsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // GSAP Hero Entry Animation Sequence
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+      tl.fromTo(
+        headlineRef.current,
+        { opacity: 0, y: 30, filter: "blur(8px)" },
+        { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.1, delay: 0.2 }
+      )
+        .fromTo(
+          subheadRef.current,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.8 },
+          "-=0.6"
+        )
+        .fromTo(
+          ctaRef.current,
+          { opacity: 0, y: 20, scale: 0.96 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.8 },
+          "-=0.5"
+        )
+        .fromTo(
+          metricsRef.current?.children ? Array.from(metricsRef.current.children) : [],
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, duration: 0.8, stagger: 0.15 },
+          "-=0.4"
+        );
+    }, heroRef);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex flex-col selection:bg-[var(--accent)] selection:text-white transition-colors duration-300">
       {/* 1. CINEMATIC HERO SECTION WITH VIVID CAREER1.PNG LANDSCAPE */}
-      <section className="relative min-h-[92vh] flex flex-col justify-between overflow-hidden text-white">
+      <section ref={heroRef} className="relative min-h-[92vh] flex flex-col justify-between overflow-hidden text-white">
         {/* Full-bleed high-res landscape backdrop (career1.png) */}
         <div className="absolute inset-0 z-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -67,19 +98,28 @@ export default function LandingPage() {
           </div>
 
           {/* Large Editorial Headline */}
-          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.1] max-w-4xl drop-shadow-lg">
+          <h1
+            ref={headlineRef}
+            className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.1] max-w-4xl drop-shadow-lg"
+          >
             Turn your skills into your <br />
             <span className="font-serif italic font-normal text-[#E8DED6]">next career move.</span>
           </h1>
 
           {/* Subtitle */}
-          <p className="text-xs sm:text-base md:text-lg text-[#EFF0F8]/85 max-w-2xl mt-4 sm:mt-5 leading-relaxed drop-shadow-md px-2">
+          <p
+            ref={subheadRef}
+            className="text-xs sm:text-base md:text-lg text-[#EFF0F8]/85 max-w-2xl mt-4 sm:mt-5 leading-relaxed drop-shadow-md px-2"
+          >
             CareerUp understands where you are, where you want to go, and what you need to do next.
             Generate your verified Career DNA, pinpoint skill bridges, and simulate your readiness.
           </p>
 
           {/* Hero Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mt-6 sm:mt-8 w-full sm:w-auto">
+          <div
+            ref={ctaRef}
+            className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mt-6 sm:mt-8 w-full sm:w-auto"
+          >
             <Link
               href="/onboarding"
               className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-7 py-3.5 sm:px-8 sm:py-4 rounded-full bg-[var(--accent)] text-white font-semibold text-xs sm:text-sm hover:bg-[var(--accent-hover)] transition-all hover:scale-105 active:scale-95 shadow-2xl border border-white/20 group"
@@ -124,7 +164,7 @@ export default function LandingPage() {
 
         {/* Translucent Metric Cards Strip over lake landscape */}
         <div className="relative z-20 mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 pb-10">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div ref={metricsRef} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-6 rounded-3xl bg-[#1A1917]/75 backdrop-blur-2xl border border-white/15 shadow-2xl hover:border-[var(--accent)]/50 transition-all card-hover-effect">
               <div className="text-xs font-semibold uppercase tracking-wider text-[#BABBC3] mb-1">
                 Career Clarity Boost
