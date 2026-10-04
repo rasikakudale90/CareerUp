@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from backend.app.db.session import get_db
 from backend.app.models.user import User
@@ -57,7 +57,10 @@ AVAILABLE_SIMULATION_SKILLS = [
 ]
 
 class SimulateRequest(BaseModel):
-    selectedSkillIds: List[str]
+    selectedSkillIds: Optional[List[str]] = None
+    hypothetical_skills: Optional[List[str]] = None
+    hypothetical_projects: Optional[List[str]] = None
+    target_role: Optional[str] = None
 
 @router.get("/skills")
 def get_simulation_skills():
@@ -72,23 +75,43 @@ def run_what_if_simulation(
     profile = db.query(StudentProfile).filter(StudentProfile.user_id == current_user.id).first()
     base_score = profile.overall_readiness_score if profile else 78
     
-    selected_skills = [s for s in AVAILABLE_SIMULATION_SKILLS if s["id"] in payload.selectedSkillIds]
-    skill_names = [s["name"] for s in selected_skills]
+    selected_skills = []
+    if payload.selectedSkillIds:
+        selected_skills = [s for s in AVAILABLE_SIMULATION_SKILLS if s["id"] in payload.selectedSkillIds]
     
-    lift = sum(int(s["impactScore"] * 0.5) for s in selected_skills)
+    skill_names = [s["name"] for s in selected_skills]
+    if payload.hypothetical_skills:
+        for sk in payload.hypothetical_skills:
+            if sk not in skill_names:
+                skill_names.append(sk)
+                selected_skills.append({
+                    "id": f"custom-{hash(sk) % 1000}",
+                    "name": sk,
+                    "category": "Custom Simulation",
+                    "impactScore": 10,
+                    "description": f"Hypothetical skill: {sk}"
+                })
+    
+    lift = sum(int(s.get("impactScore", 8) * 0.5) for s in selected_skills)
+    if lift == 0:
+        lift = 12
     projected_score = min(99, base_score + lift)
 
     fallback = {
         "projected_readiness_score": projected_score,
         "readiness_delta": lift,
         "projected_salary_increase": f"+${lift * 2000:,}",
-        "simulated_skills": skill_names,
-        "reasoning": f"Simulating {len(selected_skills)} high-leverage frameworks elevates your architecture score across Tier-1 AI SaaS companies."
+        "simulated_skills": skill_names or ["LangGraph", "Vector Databases"],
+        "reasoning": f"Simulating high-leverage frameworks elevates your architecture score across Tier-1 AI SaaS companies."
     }
 
+    student_dna = "AI Product Engineer student"
+    if profile and profile.career_dna_summary:
+        student_dna = str(profile.career_dna_summary)
+
     prompt = WHAT_IF_PROMPT.format(
-        simulated_skills=", ".join(skill_names) if skill_names else "None",
-        student_dna=profile.career_dna_summary if profile else "AI Product Engineer"
+        simulated_skills=", ".join(skill_names) if skill_names else "LangGraph, Vector Databases",
+        student_dna=student_dna
     )
 
     ai_result = gemini_client.generate_json(prompt, fallback_data=fallback)

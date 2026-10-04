@@ -156,7 +156,12 @@ def get_roadmap(current_user: User = Depends(get_current_user), db: Session = De
         "overallReadinessScore": readiness
     }
 
+@router.post("/generate")
+def generate_roadmap(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return get_roadmap(current_user=current_user, db=db)
+
 @router.patch("/tasks/{task_id}/toggle")
+@router.patch("/tasks/{task_id}/complete")
 def toggle_task(task_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     # Toggle task status and compute dynamic score lift
     profile = db.query(StudentProfile).filter(StudentProfile.user_id == current_user.id).first()

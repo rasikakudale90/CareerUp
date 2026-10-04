@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
+from typing import Optional
 from backend.app.db.session import get_db
 from backend.app.core.security import verify_password, get_password_hash, create_access_token
 from backend.app.models.user import User
@@ -10,6 +12,9 @@ from backend.app.schemas.auth import UserRegister, UserLogin, TokenResponse, Use
 from backend.app.api.deps import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+class SeedRequest(BaseModel):
+    persona: Optional[str] = "aditi"
 
 @router.post("/register", response_model=TokenResponse)
 def register(user_in: UserRegister, db: Session = Depends(get_db)):
@@ -55,16 +60,33 @@ def register(user_in: UserRegister, db: Session = Depends(get_db)):
         }
     }
 
-@router.post("/login", response_model=TokenResponse)
-def login(user_in: UserLogin, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == user_in.email).first()
-    if not user or not verify_password(user_in.password, user.hashed_password):
+@router.post("/login")
+async def login(request: Request, db: Session = Depends(get_db)):
+    email = None
+    password = None
+
+    # Check content-type to handle both JSON and x-www-form-urlencoded
+    content_type = request.headers.get("content-type", "")
+    if "application/json" in content_type:
+        body = await request.json()
+        email = body.get("email") or body.get("username")
+        password = body.get("password")
+    else:
+        form = await request.form()
+        email = form.get("username") or form.get("email")
+        password = form.get("password")
+
+    if not email or not password:
+        raise HTTPException(status_code=400, detail="Missing email/username or password.")
+
+    user = db.query(User).filter(User.email == email).first()
+    if not user or not verify_password(password, user.hashed_password):
         # Auto-create if demo credentials
-        if "sharma" in user_in.email or "morgan" in user_in.email or "test" in user_in.email:
+        if "sharma" in email or "morgan" in email or "test" in email:
             seed_personas_internal(db)
-            user = db.query(User).filter(User.email == user_in.email).first()
+            user = db.query(User).filter(User.email == email).first()
         
-        if not user:
+        if not user or not verify_password(password, user.hashed_password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect email or password."
@@ -80,6 +102,31 @@ def login(user_in: UserLogin, db: Session = Depends(get_db)):
             "name": user.full_name,
             "avatarUrl": user.avatar_url,
             "role": user.role
+        }
+    }
+
+@router.post("/seed")
+def seed_endpoint(payload: Optional[SeedRequest] = None, db: Session = Depends(get_db)):
+    seed_personas_internal(db)
+    persona = payload.persona if payload else "aditi"
+    email = "alex.morgan@stanford.edu" if persona == "alex" else "aditi.sharma@iit.ac.in"
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        user = db.query(User).first()
+    
+    token = create_access_token(user.id)
+    return {
+        "status": "success",
+        "message": f"Demo persona '{persona}' seeded successfully.",
+        "data": {
+            "access_token": token,
+            "token_type": "bearer",
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "name": user.full_name,
+                "role": user.role
+            }
         }
     }
 

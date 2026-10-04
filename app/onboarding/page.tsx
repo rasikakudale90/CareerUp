@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   Upload,
@@ -18,7 +18,9 @@ import { usePrototype } from "@/lib/prototype-state";
 export default function OnboardingPage() {
   const router = useRouter();
   const { signIn } = usePrototype();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedFile, setSelectedFile] = useState<string | null>("Aditi_Sharma_Resume_2026.pdf");
+  const [uploadedBlob, setUploadedBlob] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -29,8 +31,17 @@ export default function OnboardingPage() {
     { title: "Synthesizing Multidimensional Career DNA", desc: "Generated 92% AI Product Engineer trajectory..." },
   ];
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file.name);
+      setUploadedBlob(file);
+    }
+  };
+
   const handleSelectPersona = (fileName: string, persona: "aditi" | "alex") => {
     setSelectedFile(fileName);
+    setUploadedBlob(null);
     if (persona === "alex") {
       signIn("alex.morgan@stanford.edu", "", "alex");
     } else {
@@ -38,9 +49,23 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleStartAnalysis = () => {
+  const handleStartAnalysis = async () => {
     setIsAnalyzing(true);
     setCurrentStep(0);
+
+    // If a custom file was chosen, dispatch upload to backend asynchronously
+    if (uploadedBlob) {
+      try {
+        const formData = new FormData();
+        formData.append("file", uploadedBlob);
+        await fetch("http://localhost:8000/api/v1/resume/upload", {
+          method: "POST",
+          body: formData,
+        });
+      } catch (err) {
+        console.warn("Backend upload notification (hybrid fallback engaged):", err);
+      }
+    }
 
     const interval = setInterval(() => {
       setCurrentStep((prev) => {
@@ -92,9 +117,18 @@ export default function OnboardingPage() {
         <SpotlightCard className="p-6 sm:p-10 shadow-2xl bg-[var(--bg-card)] border border-[var(--border-color)]">
           {!isAnalyzing ? (
             <div className="space-y-8">
+              {/* Hidden file input */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept=".pdf,.docx,.txt"
+                className="hidden"
+              />
+
               {/* Drag and drop zone with Hover Glow */}
               <div
-                onClick={() => handleSelectPersona("Aditi_Sharma_Resume_2026.pdf", "aditi")}
+                onClick={() => fileInputRef.current?.click()}
                 className="border-2 border-dashed border-[var(--border-color)] hover:border-[var(--accent)] rounded-2xl p-8 sm:p-12 text-center transition-all bg-[var(--bg-card-subtle)] hover:bg-[var(--accent)]/5 cursor-pointer group card-hover-effect"
               >
                 <div className="w-14 h-14 rounded-full bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-lg">
@@ -104,7 +138,7 @@ export default function OnboardingPage() {
                   Click to upload or drag and drop your resume
                 </div>
                 <div className="text-xs text-[var(--text-muted)]">
-                  Supports PDF, DOCX, TXT or paste your LinkedIn / GitHub profile link
+                  Supports PDF, DOCX, TXT (Click here to browse files on your computer)
                 </div>
 
                 {selectedFile && (

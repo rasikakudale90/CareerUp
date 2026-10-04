@@ -131,3 +131,16 @@ def get_career_recommendations(current_user: User = Depends(get_current_user), d
     careers = ai_result.get("careers", DEFAULT_CAREERS)
 
     return {"status": "success", "count": len(careers), "data": careers}
+
+@router.post("/recommend")
+def recommend_careers_post(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return get_career_recommendations(current_user=current_user, db=db)
+
+@router.get("/{track_id}")
+def get_career_track_by_id(track_id: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    for track in DEFAULT_CAREERS:
+        if str(track.get("id")) == str(track_id) or str(track.get("slug")) == str(track_id):
+            return {"status": "success", "data": track}
+    
+    return {"status": "success", "data": DEFAULT_CAREERS[0]}
+

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.orm import Session
 from backend.app.db.session import get_db
 from backend.app.models.user import User
@@ -89,3 +89,19 @@ def get_skill_gaps(
         "totalGapHours": sum(g.get("estimatedHours", 20) for g in gaps),
         "data": gaps
     }
+
+@router.post("/analyze")
+async def analyze_skill_gap(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    track = "AI Product Engineer"
+    try:
+        body = await request.json()
+        track = body.get("target_role") or body.get("target_track") or body.get("targetRole") or track
+    except Exception:
+        pass
+    
+    return get_skill_gaps(track=track, current_user=current_user, db=db)
+
