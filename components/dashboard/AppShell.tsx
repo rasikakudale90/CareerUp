@@ -16,6 +16,7 @@ import {
   Bell,
   ChevronRight,
   RotateCcw,
+  Users,
 } from "lucide-react";
 import { usePrototype } from "@/lib/prototype-state";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -29,8 +30,10 @@ interface AppShellProps {
 export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { studentProfile, overallReadinessScore, resetState } = usePrototype();
+  const { studentProfile, overallReadinessScore, resetState, signIn } = usePrototype();
   const [searchQuery, setSearchQuery] = useState("");
+
+  const isAlex = studentProfile.id === "student-alex";
 
   const menuItems = [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -54,6 +57,14 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
     else if (q.includes("career") || q.includes("role") || q.includes("path")) router.push("/career");
     else if (q.includes("ready") || q.includes("score")) router.push("/readiness");
     else router.push("/career");
+  };
+
+  const handleTogglePersona = () => {
+    if (isAlex) {
+      signIn("aditi.sharma@iit.ac.in", "", "aditi");
+    } else {
+      signIn("alex.morgan@stanford.edu", "", "alex");
+    }
   };
 
   return (
@@ -87,6 +98,22 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
                 </span>
               </span>
             </Link>
+          </div>
+
+          {/* Quick Persona Switcher Bar in Sidebar */}
+          <div className="px-4 pt-3 pb-1">
+            <button
+              onClick={handleTogglePersona}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-2xl bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] text-xs transition-all hover:border-[var(--accent)]"
+              title="Switch Persona between Aditi & Alex"
+            >
+              <div className="flex items-center gap-2">
+                <Users className="h-3.5 w-3.5 text-[var(--accent)]" />
+                <span className="text-[11px] font-medium text-[var(--text-secondary)]">Persona:</span>
+                <span className="text-[11px] font-bold text-[var(--text-primary)]">{isAlex ? "Alex" : "Aditi"}</span>
+              </div>
+              <span className="text-[10px] uppercase font-bold text-[var(--accent)] hover:underline">Switch</span>
+            </button>
           </div>
 
           {/* Nav List */}
@@ -183,7 +210,18 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
 
           {/* Right Controls */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Theme Toggle Button in AppShell Header */}
+            {/* Quick Switch Persona Pill (Mobile & Desktop) */}
+            <button
+              onClick={handleTogglePersona}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-[var(--accent)] text-xs text-[var(--text-primary)] transition-all"
+              title="Toggle Persona"
+            >
+              <Users className="h-3.5 w-3.5 text-[var(--accent)]" />
+              <span className="hidden sm:inline text-[11px] font-medium text-[var(--text-secondary)]">Persona:</span>
+              <span className="text-[11px] font-bold">{isAlex ? "Alex" : "Aditi"}</span>
+            </button>
+
+            {/* Theme Toggle Button */}
             <ThemeToggle />
 
             {/* Search Input */}
@@ -194,7 +232,7 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Ask anything about careers..."
-                className="w-48 lg:w-64 pl-9 pr-3 py-1.5 rounded-full bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)] transition-all"
+                className="w-44 lg:w-56 pl-9 pr-3 py-1.5 rounded-full bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)] transition-all"
               />
             </form>
 
