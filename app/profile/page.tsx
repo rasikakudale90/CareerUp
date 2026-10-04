@@ -120,10 +120,10 @@ export default function ProfilePage() {
                   <button
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
-                    className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors ${
+                    className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all hover:scale-105 active:scale-95 ${
                       activeCategory === cat
-                        ? "bg-[var(--accent)] text-white font-semibold"
-                        : "bg-[var(--bg-card-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                        ? "bg-[var(--accent)] text-white font-semibold shadow-md"
+                        : "bg-[var(--bg-card-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border hover:border-[var(--accent)]/40"
                     }`}
                   >
                     {cat}
@@ -136,11 +136,13 @@ export default function ProfilePage() {
               {filteredSkills.map((sk) => (
                 <div
                   key={sk.name}
-                  className="p-3.5 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] space-y-2"
+                  className="p-3.5 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] space-y-2 hover:border-[var(--accent)]/60 hover:translate-x-1 transition-all cursor-pointer group"
                 >
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[var(--text-primary)]">{sk.name}</span>
+                      <span className="font-bold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">
+                        {sk.name}
+                      </span>
                       <span className="text-[10px] text-[var(--text-secondary)] px-2 py-0.5 rounded bg-black/10 dark:bg-black/40">
                         {sk.category}
                       </span>
@@ -171,16 +173,18 @@ export default function ProfilePage() {
             {studentProfile.projects.map((proj) => (
               <div
                 key={proj.id}
-                className="p-4 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex flex-col justify-between"
+                className="p-4 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex flex-col justify-between hover:-translate-y-1.5 hover:shadow-xl hover:border-[var(--accent)] transition-all duration-300 group"
               >
                 <div>
-                  <h4 className="text-xs font-bold text-[var(--text-primary)] mb-1">{proj.title}</h4>
+                  <h4 className="text-xs font-bold text-[var(--text-primary)] mb-1 group-hover:text-[var(--accent)] transition-colors">
+                    {proj.title}
+                  </h4>
                   <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed mb-3">{proj.description}</p>
                   <div className="flex flex-wrap gap-1 mb-3">
                     {proj.technologies.map((t) => (
                       <span
                         key={t}
-                        className="px-2 py-0.5 rounded bg-[var(--border-color)] text-[10px] text-[var(--text-secondary)]"
+                        className="px-2 py-0.5 rounded bg-[var(--border-color)] text-[10px] text-[var(--text-secondary)] hover:border-[var(--accent)] hover:scale-105 transition-all cursor-default"
                       >
                         {t}
                       </span>
@@ -195,7 +199,7 @@ export default function ProfilePage() {
                       href={proj.githubUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[var(--accent)] hover:underline flex items-center gap-1"
+                      className="text-[var(--accent)] hover:underline flex items-center gap-1 hover:scale-105 active:scale-95 transition-transform"
                     >
                       <Code2 className="h-3 w-3" />
                       <span>Code</span>

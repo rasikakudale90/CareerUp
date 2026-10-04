@@ -66,19 +66,19 @@ export default function DashboardPage() {
 
               {/* Matrix Pills with hover glows */}
               <div className="grid grid-cols-2 gap-2 text-xs pt-3 border-t border-[var(--border-color)]">
-                <div className="flex items-center justify-between p-2 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)] hover:border-[var(--accent)]/40 transition-colors">
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)] interactive-pill">
                   <span className="text-[var(--text-secondary)]">Technical</span>
                   <span className="font-bold text-[var(--text-primary)]">{studentProfile.radarScores.technical}%</span>
                 </div>
-                <div className="flex items-center justify-between p-2 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)] hover:border-[var(--accent)]/40 transition-colors">
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)] interactive-pill">
                   <span className="text-[var(--text-secondary)]">Analytical</span>
                   <span className="font-bold text-[var(--text-primary)]">{studentProfile.radarScores.analytical}%</span>
                 </div>
-                <div className="flex items-center justify-between p-2 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)] hover:border-[var(--accent)]/40 transition-colors">
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)] interactive-pill">
                   <span className="text-[var(--text-secondary)]">Communication</span>
                   <span className="font-bold text-[var(--text-primary)]">{studentProfile.radarScores.communication}%</span>
                 </div>
-                <div className="flex items-center justify-between p-2 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)] hover:border-[var(--accent)]/40 transition-colors">
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)] interactive-pill">
                   <span className="text-[var(--text-secondary)]">Leadership</span>
                   <span className="font-bold text-[var(--text-primary)]">{studentProfile.radarScores.leadership}%</span>
                 </div>

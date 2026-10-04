@@ -41,14 +41,14 @@ export function SpotlightCard({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
-      className={`relative rounded-3xl border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)] overflow-hidden transition-all duration-300 hover:border-[var(--accent)] hover:shadow-2xl ${className}`}
+      className={`relative rounded-3xl border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)] overflow-hidden transition-all duration-300 hover:border-[var(--accent)] hover:shadow-2xl hover:-translate-y-1 ${className}`}
     >
       {/* Mouse Spotlight Glow */}
       <div
-        className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 z-0"
+        className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 z-0"
         style={{
           opacity,
-          background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 60%)`,
+          background: `radial-gradient(550px circle at ${position.x}px ${position.y}px, ${spotlightColor}, transparent 65%)`,
         }}
       />
       <div className="relative z-10 h-full">{children}</div>

@@ -51,7 +51,7 @@
     --color-info: #667482;
     --color-info-soft: #E5E9ED;
 
-    --spotlight-glow: rgba(142, 112, 90, 0.16);
+    --spotlight-glow: rgba(142, 112, 90, 0.32);
 
     --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     --font-body: 'Inter', system-ui, -apple-system, sans-serif;
@@ -94,7 +94,7 @@
     --color-info: #8598AB;
     --color-info-soft: rgba(102, 116, 130, 0.25);
 
-    --spotlight-glow: rgba(142, 112, 90, 0.22);
+    --spotlight-glow: rgba(166, 134, 109, 0.40);
   }
 }
 
@@ -140,17 +140,51 @@ body {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Interactive Luxury Hover Effects */
+/* Interactive Luxury Hover Microinteraction Utilities */
 .card-hover-effect {
   position: relative;
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
 }
 
 .card-hover-effect:hover {
   transform: translateY(-4px);
   border-color: var(--accent);
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4), 0 0 25px -5px var(--accent-glow);
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.18), 0 0 24px -4px var(--accent-glow);
+}
+
+.interactive-pill {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+.interactive-pill:hover {
+  transform: translateY(-2px) scale(1.04);
+  border-color: var(--accent) !important;
+  box-shadow: 0 4px 12px -2px var(--accent-glow);
+}
+.interactive-pill:active {
+  transform: scale(0.96);
+}
+
+.interactive-row {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+.interactive-row:hover {
+  transform: translateX(4px);
+  border-color: var(--accent);
+  background-color: var(--bg-card-subtle);
+}
+
+.btn-hover-lift {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -4px var(--accent-glow);
+}
+.btn-hover-lift:active {
+  transform: translateY(0px) scale(0.98);
 }
 
 .btn-clay {
@@ -161,8 +195,11 @@ body {
 }
 .btn-clay:hover {
   background-color: var(--accent-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   box-shadow: 0 0 25px var(--accent-glow);
+}
+.btn-clay:active {
+  transform: scale(0.97);
 }
 
 .btn-outline-pill {
@@ -175,6 +212,10 @@ body {
 .btn-outline-pill:hover {
   border-color: var(--accent);
   background-color: var(--accent-soft);
+  transform: translateY(-1px);
+}
+.btn-outline-pill:active {
+  transform: scale(0.97);
 }
 
 /* Shimmer Animation */

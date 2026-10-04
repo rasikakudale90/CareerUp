@@ -202,10 +202,10 @@ export default function WhatIfPage() {
                   <button
                     key={cSkill.id}
                     onClick={() => toggleCustomSkill(cSkill.id)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1.5 ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1.5 interactive-pill ${
                       cSkill.added
                         ? "bg-[var(--accent)] text-white border-[var(--accent)] shadow-md"
-                        : "bg-[var(--bg-card-subtle)] text-[var(--text-secondary)] border-[var(--border-color)]"
+                        : "bg-[var(--bg-card-subtle)] text-[var(--text-secondary)] border-[var(--border-color)] hover:border-[var(--accent)]"
                     }`}
                   >
                     {cSkill.added ? <Check className="h-3 w-3" /> : <Plus className="h-3 w-3" />}

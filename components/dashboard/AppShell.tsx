@@ -125,14 +125,18 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all ${
+                  className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all duration-200 hover:translate-x-1.5 active:scale-95 ${
                     isActive
                       ? "bg-[var(--accent-soft)] text-[var(--text-primary)] font-bold border border-[var(--accent)]/30 shadow-md"
-                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)]"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)] hover:border hover:border-[var(--border-color)]"
                   }`}
                 >
-                  <Icon className={`h-4 w-4 ${isActive ? "text-[var(--accent)]" : "text-[var(--text-secondary)]"}`} />
-                  <span>{item.label}</span>
+                  <Icon
+                    className={`h-4 w-4 transition-transform duration-200 group-hover:scale-110 ${
+                      isActive ? "text-[var(--accent)]" : "text-[var(--text-secondary)] group-hover:text-[var(--accent)]"
+                    }`}
+                  />
+                  <span className="transition-colors">{item.label}</span>
                   {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-ping" />}
                 </Link>
               );
@@ -213,7 +217,7 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
             {/* Quick Switch Persona Pill (Mobile & Desktop) */}
             <button
               onClick={handleTogglePersona}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-[var(--accent)] text-xs text-[var(--text-primary)] transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-[var(--accent)] text-xs text-[var(--text-primary)] transition-all hover:scale-105 active:scale-95 shadow-sm"
               title="Toggle Persona"
             >
               <Users className="h-3.5 w-3.5 text-[var(--accent)]" />
@@ -232,26 +236,26 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Ask anything about careers..."
-                className="w-44 lg:w-56 pl-9 pr-3 py-1.5 rounded-full bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)] transition-all"
+                className="w-44 lg:w-56 pl-9 pr-3 py-1.5 rounded-full bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)] transition-all hover:border-[var(--accent)]/50"
               />
             </form>
 
             {/* Notification Bell */}
             <Link
               href="/dashboard"
-              className="p-2 rounded-full bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors relative"
+              className="p-2 rounded-full bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all hover:scale-110 active:scale-95 relative"
             >
               <Bell className="h-4 w-4" />
               <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
             </Link>
 
             {/* User Avatar */}
-            <Link href="/profile">
+            <Link href="/profile" className="hover:scale-110 active:scale-95 transition-transform">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={studentProfile.avatarUrl}
                 alt={studentProfile.name}
-                className="w-8 h-8 rounded-full object-cover border border-[var(--accent)] hover:scale-105 transition-transform shadow-md"
+                className="w-8 h-8 rounded-full object-cover border-2 border-[var(--accent)] shadow-md"
               />
             </Link>
           </div>

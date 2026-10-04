@@ -135,7 +135,7 @@ export default function CareerPage() {
                           {career.keyMissingSkills.map((sk) => (
                             <span
                               key={sk}
-                              className="px-2.5 py-1 rounded-lg bg-red-500/15 border border-red-500/30 text-red-500 text-xs font-medium"
+                              className="px-2.5 py-1 rounded-lg bg-red-500/15 border border-red-500/30 text-red-500 text-xs font-medium interactive-pill"
                             >
                               {sk}
                             </span>
@@ -151,7 +151,7 @@ export default function CareerPage() {
                           {career.topCompanies.map((comp) => (
                             <span
                               key={comp}
-                              className="px-2.5 py-1 rounded-lg bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-[var(--text-primary)] text-xs"
+                              className="px-2.5 py-1 rounded-lg bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-[var(--text-primary)] text-xs interactive-pill"
                             >
                               {comp}
                             </span>
@@ -171,7 +171,7 @@ export default function CareerPage() {
                 <div className="pt-4 mt-4 border-t border-[var(--border-color)] flex items-center justify-between gap-3">
                   <button
                     onClick={() => setExpandedCareerId(isExpanded ? null : career.id)}
-                    className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
+                    className="text-xs text-[var(--text-secondary)] hover:text-[var(--accent)] flex items-center gap-1 transition-all hover:scale-105 active:scale-95"
                   >
                     <span>{isExpanded ? "Collapse" : "Full Details"}</span>
                     {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
@@ -180,13 +180,13 @@ export default function CareerPage() {
                   <div className="flex items-center gap-2">
                     <Link
                       href="/skill-gap"
-                      className="px-3 py-1.5 rounded-xl bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] text-xs font-medium text-[var(--text-primary)] transition-colors"
+                      className="px-3 py-1.5 rounded-xl bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] text-xs font-medium text-[var(--text-primary)] transition-all hover:scale-105 active:scale-95 hover:border-[var(--accent)]"
                     >
                       Skill Gaps
                     </Link>
                     <Link
                       href="/roadmap"
-                      className="px-3.5 py-1.5 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-xs font-semibold text-white transition-all shadow-md flex items-center gap-1.5"
+                      className="px-3.5 py-1.5 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-xs font-semibold text-white transition-all shadow-md flex items-center gap-1.5 hover:scale-105 active:scale-95"
                     >
                       <span>Start Roadmap</span>
                       <ArrowRight className="h-3 w-3" />
