@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import {
   Upload,
   Sparkles,
@@ -11,8 +10,6 @@ import {
   ArrowRight,
   Loader2,
   Cpu,
-  Users2,
-  BookOpen,
 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { SpotlightCard } from "@/components/motion/SpotlightCard";
@@ -20,7 +17,7 @@ import { usePrototype } from "@/lib/prototype-state";
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { studentProfile } = usePrototype();
+  const { signIn } = usePrototype();
   const [selectedFile, setSelectedFile] = useState<string | null>("Aditi_Sharma_Resume_2026.pdf");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -31,6 +28,15 @@ export default function OnboardingPage() {
     { title: "Benchmarking Against Tier-1 Industry Rubrics", desc: "Matching with OpenAI, Linear, Scale AI standards..." },
     { title: "Synthesizing Multidimensional Career DNA", desc: "Generated 92% AI Product Engineer trajectory..." },
   ];
+
+  const handleSelectPersona = (fileName: string, persona: "aditi" | "alex") => {
+    setSelectedFile(fileName);
+    if (persona === "alex") {
+      signIn("alex.morgan@stanford.edu", "", "alex");
+    } else {
+      signIn("aditi.sharma@iit.ac.in", "", "aditi");
+    }
+  };
 
   const handleStartAnalysis = () => {
     setIsAnalyzing(true);
@@ -47,7 +53,7 @@ export default function OnboardingPage() {
         }
         return prev + 1;
       });
-    }, 1200);
+    }, 1100);
   };
 
   return (
@@ -88,7 +94,7 @@ export default function OnboardingPage() {
             <div className="space-y-8">
               {/* Drag and drop zone with Hover Glow */}
               <div
-                onClick={() => setSelectedFile("Aditi_Sharma_Resume_2026.pdf")}
+                onClick={() => handleSelectPersona("Aditi_Sharma_Resume_2026.pdf", "aditi")}
                 className="border-2 border-dashed border-[var(--border-color)] hover:border-[var(--accent)] rounded-2xl p-8 sm:p-12 text-center transition-all bg-[var(--bg-card-subtle)] hover:bg-[var(--accent)]/5 cursor-pointer group card-hover-effect"
               >
                 <div className="w-14 h-14 rounded-full bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-lg">
@@ -117,7 +123,7 @@ export default function OnboardingPage() {
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <button
-                    onClick={() => setSelectedFile("Aditi_Sharma_Resume_2026.pdf")}
+                    onClick={() => handleSelectPersona("Aditi_Sharma_Resume_2026.pdf", "aditi")}
                     className={`p-3.5 rounded-2xl text-left border transition-all flex items-center justify-between card-hover-effect ${
                       selectedFile === "Aditi_Sharma_Resume_2026.pdf"
                         ? "bg-[var(--accent)]/15 border-[var(--accent)] text-[var(--text-primary)] shadow-lg"
@@ -136,7 +142,7 @@ export default function OnboardingPage() {
                   </button>
 
                   <button
-                    onClick={() => setSelectedFile("Alex_Morgan_Data_Resume.pdf")}
+                    onClick={() => handleSelectPersona("Alex_Morgan_Data_Resume.pdf", "alex")}
                     className={`p-3.5 rounded-2xl text-left border transition-all flex items-center justify-between card-hover-effect ${
                       selectedFile === "Alex_Morgan_Data_Resume.pdf"
                         ? "bg-[var(--accent)]/15 border-[var(--accent)] text-[var(--text-primary)] shadow-lg"
