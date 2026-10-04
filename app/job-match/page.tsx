@@ -19,10 +19,79 @@ import {
   Layers,
   BookOpen,
   Copy,
+  CheckCheck,
 } from "lucide-react";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { SpotlightCard } from "@/components/motion/SpotlightCard";
 import { usePrototype } from "@/lib/prototype-state";
+
+// Helper to provide context-aware bridging paths & code proof for any missing skill
+function getSkillBridgeDetails(skillName: string) {
+  const s = skillName.toLowerCase();
+  if (s.includes("vector")) {
+    return {
+      title: "Vector Databases & Hybrid Search",
+      simId: "sim-vectordb",
+      boostPct: "+7% ATS Fit",
+      simDesc:
+        "Instantly simulate Vector DB & dense-sparse retrieval mastery to unlock high-relevance RAG pipelines and pass corporate ATS filters.",
+      roadmapPhase: "Phase 1: Advanced Vector Search & Embeddings",
+      roadmapSprint: "Build Sub-50ms Hybrid Vector Search with Pinecone & LangChain",
+      bullet:
+        "Architected and deployed hybrid semantic vector retrieval pipeline using Pinecone and OpenAI text-embedding-3-small, achieving <45ms p99 latency across 250k indexed vectors.",
+      codeSnippet: `from langchain_community.vectorstores import Pinecone
+from langchain_openai import OpenAIEmbeddings
+
+vectorstore = Pinecone.from_documents(docs, OpenAIEmbeddings(), index_name="career-rag")`,
+    };
+  }
+  if (s.includes("agent") || s.includes("langgraph")) {
+    return {
+      title: "LangGraph & Autonomous Agentic Workflows",
+      simId: "sim-langgraph",
+      boostPct: "+8% ATS Fit",
+      simDesc:
+        "Simulate cyclic agent graph design, state checkpoints, and structured tool calling in your profile.",
+      roadmapPhase: "Phase 2: Agentic Orchestration",
+      roadmapSprint: "Build Multi-Agent Orchestrator with Human-in-the-Loop Safeguards",
+      bullet:
+        "Engineered stateful multi-agent system using LangGraph and FastAPI, reducing multi-step workflow hallucination by 34%.",
+      codeSnippet: `from langgraph.graph import StateGraph, END
+
+workflow = StateGraph(AgentState)
+workflow.add_node("planner", plan_agent)
+workflow.add_node("executor", execute_tool)
+workflow.add_edge("planner", "executor")`,
+    };
+  }
+  if (s.includes("docker") || s.includes("container") || s.includes("k8s")) {
+    return {
+      title: "Docker Containerization & MLOps",
+      simId: "sim-docker",
+      boostPct: "+5% ATS Fit",
+      simDesc:
+        "Simulate multi-stage container builds and microservice orchestration in production environments.",
+      roadmapPhase: "Phase 3: Production Cloud & MLOps",
+      roadmapSprint: "Containerize and Deploy Microservices with Docker Compose & CI/CD",
+      bullet:
+        "Containerized multi-service ML inferencing stack with multi-stage Docker builds, reducing cold-start image size by 58%.",
+      codeSnippet: `FROM python:3.11-slim
+COPY --from=builder /app /app
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]`,
+    };
+  }
+  // Generic / Custom parsed skill
+  return {
+    title: skillName,
+    simId: "sim-vectordb",
+    boostPct: "+7% ATS Fit",
+    simDesc: `Simulate high-proficiency mastery of ${skillName} in your verified tech profile.`,
+    roadmapPhase: "Phase 3: Technical Specialization",
+    roadmapSprint: `Hands-On Mastery Sprint: ${skillName} Architecture & Testing`,
+    bullet: `Implemented production-grade ${skillName} pipeline with automated telemetry and performance benchmarking, meeting enterprise SLA requirements.`,
+    codeSnippet: `# Integrated ${skillName} into production service architecture\n# Benchmarked at 99.9% uptime SLA`,
+  };
+}
 
 export default function JobMatchPage() {
   const {
@@ -33,7 +102,6 @@ export default function JobMatchPage() {
     toggleSimulatedSkill,
     isSimulatedSkillActive,
     roadmap,
-    toggleRoadmapTask,
   } = usePrototype();
 
   const [activeTab, setActiveTab] = useState<"browse" | "custom">("browse");
@@ -42,15 +110,19 @@ export default function JobMatchPage() {
   const [customJD, setCustomJD] = useState("");
   const [isParsing, setIsParsing] = useState(false);
   const [bridgedSkillNotification, setBridgedSkillNotification] = useState<string | null>(null);
-  
+
   // Modal state for in-depth skill bridging
-  const [activeModalSkill, setActiveModalSkill] = useState<{ skill: string; jobTitle: string; company: string } | null>(null);
+  const [activeModalSkill, setActiveModalSkill] = useState<{
+    skill: string;
+    jobTitle: string;
+    company: string;
+  } | null>(null);
   const [copiedBullet, setCopiedBullet] = useState(false);
 
   // Check if a skill name is bridged via roadmap completion or simulation
   const isSkillBridged = (skillName: string) => {
     const sName = skillName.toLowerCase();
-    
+
     // Check simulated skills
     if (sName.includes("vector") && isSimulatedSkillActive("sim-vectordb")) return true;
     if (sName.includes("agent") && isSimulatedSkillActive("sim-langgraph")) return true;
@@ -60,28 +132,34 @@ export default function JobMatchPage() {
 
     // Check completed roadmap tasks
     const completedTasks = roadmap.flatMap((m) => m.tasks).filter((t) => t.completed);
-    if (sName.includes("vector") && completedTasks.some((t) => t.title.toLowerCase().includes("vector") || t.title.toLowerCase().includes("hybrid"))) return true;
-    if (sName.includes("agent") && completedTasks.some((t) => t.title.toLowerCase().includes("agent") || t.title.toLowerCase().includes("langgraph"))) return true;
-    if (sName.includes("docker") && completedTasks.some((t) => t.title.toLowerCase().includes("docker"))) return true;
+    if (
+      sName.includes("vector") &&
+      completedTasks.some(
+        (t) =>
+          t.title.toLowerCase().includes("vector") ||
+          t.title.toLowerCase().includes("hybrid")
+      )
+    )
+      return true;
+    if (
+      sName.includes("agent") &&
+      completedTasks.some(
+        (t) =>
+          t.title.toLowerCase().includes("agent") ||
+          t.title.toLowerCase().includes("langgraph")
+      )
+    )
+      return true;
+    if (sName.includes("docker") && completedTasks.some((t) => t.title.toLowerCase().includes("docker")))
+      return true;
 
     return false;
   };
 
   const handleQuickBridgeSkill = (skillName: string) => {
-    const sName = skillName.toLowerCase();
-    if (sName.includes("vector")) {
-      toggleSimulatedSkill("sim-vectordb");
-      setBridgedSkillNotification("✨ 'Vector DB (Pinecone/Milvus)' bridged! Match score jumped to 98%.");
-    } else if (sName.includes("agent")) {
-      toggleSimulatedSkill("sim-langgraph");
-      setBridgedSkillNotification("✨ 'Agentic Tooling' bridged! Match score jumped to 96%.");
-    } else if (sName.includes("docker")) {
-      toggleSimulatedSkill("sim-docker");
-      setBridgedSkillNotification("✨ 'Docker' bridged! Match score updated.");
-    } else {
-      toggleSimulatedSkill("sim-vectordb");
-      setBridgedSkillNotification(`✨ '${skillName}' bridged via Simulation Sandbox.`);
-    }
+    const details = getSkillBridgeDetails(skillName);
+    toggleSimulatedSkill(details.simId);
+    setBridgedSkillNotification(`✨ '${details.title}' bridged! ATS match updated.`);
 
     setTimeout(() => {
       setBridgedSkillNotification(null);
@@ -107,7 +185,8 @@ export default function JobMatchPage() {
       addCustomJobMatch({
         id: `custom-job-${Date.now()}`,
         company: customCompany || "Target Tech Co.",
-        companyLogo: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=80",
+        companyLogo:
+          "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=80",
         title: customRoleTitle,
         location: "Remote / Hybrid",
         workType: "Remote",
@@ -126,6 +205,8 @@ export default function JobMatchPage() {
       setCustomJD("");
     }, 900);
   };
+
+  const activeBridgeDetails = activeModalSkill ? getSkillBridgeDetails(activeModalSkill.skill) : null;
 
   return (
     <AppShell
@@ -210,11 +291,13 @@ export default function JobMatchPage() {
 
                     <div className="flex items-center gap-4 self-start sm:self-auto">
                       <div className="text-right">
-                        <div className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
-                          dynamicMatch >= 95
-                            ? "bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 shadow-md"
-                            : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-500"
-                        }`}>
+                        <div
+                          className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                            dynamicMatch >= 95
+                              ? "bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 shadow-md"
+                              : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-500"
+                          }`}
+                        >
                           {dynamicMatch}% ATS Fit {bridgedSkills.length > 0 && "(+Bridged)"}
                         </div>
                         <span className="text-[10px] text-[var(--text-muted)] block mt-0.5">{job.salaryRange}</span>
@@ -276,19 +359,20 @@ export default function JobMatchPage() {
                             </span>
                           </span>
                           <div className="flex flex-wrap gap-1.5">
-                          {actuallyMissing.map((sk) => (
-                            <button
-                              key={sk}
-                              onClick={() => handleOpenBridgeModal(sk, job.title, job.company)}
-                              className="px-2.5 py-1 rounded-md bg-red-500/10 hover:bg-red-500/25 border border-red-500/30 text-red-600 dark:text-red-300 text-[11px] font-medium transition-all flex items-center gap-1.5 group/skill shadow-sm active:scale-95"
-                              title="Click for AI skill bridge options"
-                            >
-                              <span>{sk}</span>
-                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 font-bold group-hover/skill:bg-red-500 group-hover/skill:text-white transition-all">
-                                ⚡ Bridge
-                              </span>
-                            </button>
-                          ))}
+                            {actuallyMissing.map((sk) => (
+                              <button
+                                key={sk}
+                                onClick={() => handleOpenBridgeModal(sk, job.title, job.company)}
+                                className="px-2.5 py-1 rounded-md bg-red-500/10 hover:bg-red-500/25 border border-red-500/30 text-red-600 dark:text-red-300 text-[11px] font-medium transition-all flex items-center gap-1.5 group/skill shadow-sm active:scale-95"
+                                title="Click for AI skill bridge options"
+                              >
+                                <span>{sk}</span>
+                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 font-bold group-hover/skill:bg-red-500 group-hover/skill:text-white transition-all">
+                                  ⚡ Bridge
+                                </span>
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -403,10 +487,10 @@ export default function JobMatchPage() {
           </SpotlightCard>
         )}
 
-        {/* Skill Bridge Action Modal */}
-        {activeModalSkill && (
+        {/* Dynamic Skill Bridge Action Modal */}
+        {activeModalSkill && activeBridgeDetails && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="w-full max-w-xl bg-[var(--bg-card)] border border-[var(--border-color)] rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative">
+            <div className="w-full max-w-xl bg-[var(--bg-card)] border border-[var(--border-color)] rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto">
               <button
                 onClick={() => setActiveModalSkill(null)}
                 className="absolute top-5 right-5 p-2 rounded-full bg-[var(--bg-card-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
@@ -415,12 +499,12 @@ export default function JobMatchPage() {
               </button>
 
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-red-500 flex items-center justify-center text-white shadow-lg">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-red-500 flex items-center justify-center text-white shadow-lg shrink-0">
                   <Sparkles className="h-5 w-5" />
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-[var(--text-primary)]">
-                    Bridge Requirement: {activeModalSkill.skill}
+                    Bridge Requirement: {activeBridgeDetails.title}
                   </h3>
                   <p className="text-xs text-[var(--text-secondary)]">
                     Target: {activeModalSkill.company} • {activeModalSkill.jobTitle}
@@ -438,18 +522,18 @@ export default function JobMatchPage() {
                       <span>Option 1: Instant AI Sandbox Bridge (Recommended)</span>
                     </span>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold">
-                      +7% ATS Boost (98%)
+                      {activeBridgeDetails.boostPct}
                     </span>
                   </div>
                   <p className="text-xs text-[var(--text-secondary)] mb-3">
-                    Instantly simulate Vector DB mastery in your profile to preview unlocked hiring pipelines, salary jump (+$18k), and pass ATS filters.
+                    {activeBridgeDetails.simDesc}
                   </p>
                   <button
                     onClick={() => {
                       handleQuickBridgeSkill(activeModalSkill.skill);
                       setActiveModalSkill(null);
                     }}
-                    className="w-full py-2 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold transition-all shadow-md flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold transition-all shadow-md flex items-center justify-center gap-1.5"
                   >
                     <span>Activate Instant Sandbox Bridge</span>
                     <Check className="h-3.5 w-3.5" />
@@ -461,17 +545,17 @@ export default function JobMatchPage() {
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-1.5">
                       <Layers className="h-3.5 w-3.5 text-blue-400" />
-                      <span>Option 2: Add Capstone Project to Roadmap</span>
+                      <span>Option 2: Add Capstone Sprint to Roadmap</span>
                     </span>
-                    <span className="text-[10px] text-[var(--text-muted)]">2-Day Sprint</span>
+                    <span className="text-[10px] text-[var(--text-muted)]">{activeBridgeDetails.roadmapPhase}</span>
                   </div>
-                  <p className="text-xs text-[var(--text-secondary)] mb-3">
-                    Inject a hands-on project into Phase 3: &quot;Build Sub-50ms Hybrid Vector Search with Pinecone &amp; LangChain&quot;.
+                  <p className="text-xs text-[var(--text-secondary)] mb-3 font-medium">
+                    &quot;{activeBridgeDetails.roadmapSprint}&quot;
                   </p>
                   <Link
                     href="/roadmap"
                     onClick={() => setActiveModalSkill(null)}
-                    className="w-full py-2 rounded-xl bg-[var(--border-color)] hover:bg-[var(--text-muted)]/20 text-[var(--text-primary)] text-xs font-semibold transition-all border border-[var(--border-color)] flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 rounded-xl bg-[var(--border-color)] hover:bg-[var(--text-muted)]/20 text-[var(--text-primary)] text-xs font-semibold transition-all border border-[var(--border-color)] flex items-center justify-center gap-1.5"
                   >
                     <span>Open Roadmap &amp; Start Sprint</span>
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -479,26 +563,25 @@ export default function JobMatchPage() {
                 </div>
 
                 {/* Option 3: Verified Resume Bullet & Code Proof */}
-                <div className="p-4 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)]">
-                  <div className="flex items-center justify-between mb-2">
+                <div className="p-4 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] space-y-2.5">
+                  <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-1.5">
                       <Code2 className="h-3.5 w-3.5 text-emerald-400" />
-                      <span>Option 3: ATS-Optimized Resume Bullet Point</span>
+                      <span>Option 3: ATS-Optimized Resume Bullet &amp; Proof</span>
                     </span>
                     <button
-                      onClick={() =>
-                        handleCopyBullet(
-                          "Architected and deployed hybrid semantic vector retrieval pipeline using Pinecone and OpenAI text-embedding-3-small, achieving <45ms p99 latency across 250k indexed vectors."
-                        )
-                      }
+                      onClick={() => handleCopyBullet(activeBridgeDetails.bullet)}
                       className="text-[10px] text-[var(--accent)] hover:underline flex items-center gap-1 font-semibold"
                     >
-                      <Copy className="h-3 w-3" />
+                      {copiedBullet ? <CheckCheck className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                       <span>{copiedBullet ? "Copied!" : "Copy Bullet"}</span>
                     </button>
                   </div>
                   <div className="p-3 rounded-xl bg-black/40 border border-white/5 text-[11px] text-[var(--text-secondary)] font-mono leading-relaxed">
-                    &quot;Architected and deployed hybrid semantic vector retrieval pipeline using Pinecone and OpenAI text-embedding-3-small, achieving &lt;45ms p99 latency across 250k indexed vectors.&quot;
+                    &quot;{activeBridgeDetails.bullet}&quot;
+                  </div>
+                  <div className="p-3 rounded-xl bg-black/60 border border-white/5 text-[10px] text-emerald-400 font-mono leading-relaxed overflow-x-auto whitespace-pre">
+                    {activeBridgeDetails.codeSnippet}
                   </div>
                 </div>
               </div>
