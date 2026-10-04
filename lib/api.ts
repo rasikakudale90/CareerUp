@@ -7,7 +7,9 @@ import {
   SAMPLE_JOB_MATCHES,
 } from "./mock-data";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+const RAW_API_URL = process.env.NEXT_PUBLIC_API_URL || (typeof window !== "undefined" && window.location.hostname === "localhost" ? "http://localhost:8000" : "https://careerup-h35y.onrender.com");
+const API_BASE_URL = RAW_API_URL.endsWith("/api/v1") ? RAW_API_URL : `${RAW_API_URL.replace(/\/$/, "")}/api/v1`;
+
 
 // Helper for safe fetch with graceful fallback
 async function safeFetch<T>(endpoint: string, options: RequestInit = {}, fallback: T): Promise<T> {
