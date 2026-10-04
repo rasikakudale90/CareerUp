@@ -29,7 +29,10 @@ app.add_middleware(
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 
 from backend.app.api.auth import router as auth_router
+from backend.app.api.resume import router as resume_router
+
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(resume_router, prefix="/api/v1")
 
 @app.get("/api/health", tags=["Health"])
 def health_check():
