@@ -1,0 +1,677 @@
+{
+	"info": {
+		"_postman_id": "careerup-ai-fastapi-backend-v1",
+		"name": "CareerUp AI Navigator - Backend API Collection",
+		"description": "Comprehensive Postman test collection for the CareerUp AI Student Career Navigator FastAPI backend.\nCovers Authentication, Student Profile, Resume Parsing, AI Career Recommendations, Skill Gap Analysis, Dynamic Milestone Roadmap, What-If Simulator, ATS Job Matcher & Readiness, and AI Audit History.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "bearer_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "sample_track_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "sample_task_id",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "0. System Health & Root",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": ["{{base_url}}"],
+							"path": ["health"]
+						},
+						"description": "Checks system operational status, active database dialect, and Gemini AI readiness."
+					},
+					"response": []
+				},
+				{
+					"name": "API Root Welcome",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": ["{{base_url}}"],
+							"path": [""]
+						},
+						"description": "Returns API metadata, version, and documentation link."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "1. Authentication & Seeding",
+			"item": [
+				{
+					"name": "Seed Demo Persona (Aditi Sharma)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    if (json.data && json.data.access_token) {",
+									"        pm.collectionVariables.set('bearer_token', json.data.access_token);",
+									"        console.log('Bearer Token updated successfully for Aditi Sharma');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"persona\": \"aditi\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/seed",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "seed"]
+						},
+						"description": "Seeds demo student profile (Aditi Sharma - 3rd Year CS) with preloaded skills, projects, and returns immediate JWT Bearer token."
+					},
+					"response": []
+				},
+				{
+					"name": "Seed Demo Persona (Alex Morgan)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    if (json.data && json.data.access_token) {",
+									"        pm.collectionVariables.set('bearer_token', json.data.access_token);",
+									"        console.log('Bearer Token updated for Alex Morgan');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"persona\": \"alex\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/seed",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "seed"]
+						},
+						"description": "Seeds demo student profile (Alex Morgan - Final Year AI/ML Specialist) with preloaded data and returns JWT."
+					},
+					"response": []
+				},
+				{
+					"name": "Register New Student User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201 || pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    if (json.access_token) {",
+									"        pm.collectionVariables.set('bearer_token', json.access_token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"teststudent@careerup.ai\",\n  \"full_name\": \"Test Student\",\n  \"password\": \"CareerUpSecurePass2026!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "register"]
+						},
+						"description": "Creates a fresh student account and provides a JWT Bearer token."
+					},
+					"response": []
+				},
+				{
+					"name": "Login (OAuth2 Form Data)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var json = pm.response.json();",
+									"    if (json.access_token) {",
+									"        pm.collectionVariables.set('bearer_token', json.access_token);",
+									"        console.log('Login successful. Bearer token set.');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "aditi.sharma@example.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "CareerUpDemo2026!",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "login"]
+						},
+						"description": "Authenticates user and refreshes active Bearer token in the Postman collection."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User (Me)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/me",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "me"]
+						},
+						"description": "Returns current authenticated student user info and verification status."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Student Profile & Resume Ingestion",
+			"item": [
+				{
+					"name": "Get Full Student Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/profile",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "profile"]
+						},
+						"description": "Retrieves the authenticated student's full profile including skills, projects, and experiences."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile & Career Preferences",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"major\": \"Computer Science & Engineering\",\n  \"university\": \"National Institute of Technology\",\n  \"graduation_year\": 2026,\n  \"gpa\": 3.88,\n  \"target_roles\": [\"AI Systems Engineer\", \"Full Stack Developer\", \"MLOps Engineer\"],\n  \"preferred_locations\": [\"Bangalore\", \"Remote\", \"San Francisco\"],\n  \"bio\": \"Passionate computer science student specializing in autonomous AI workflows, Next.js, and high-performance Python microservices.\",\n  \"github_url\": \"https://github.com/aditisharma-cs\",\n  \"linkedin_url\": \"https://linkedin.com/in/aditisharma-dev\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/profile",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "profile"]
+						},
+						"description": "Updates student academic background, target roles, and portfolio links."
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Resume (PDF / DOCX / TXT)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": ""
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/profile/upload-resume",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "profile", "upload-resume"]
+						},
+						"description": "Extracts text from resume file (max 5MB), parses entities with Gemini AI, and populates skills, projects, and experiences."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. AI Career Track Recommendations",
+			"item": [
+				{
+					"name": "Generate AI Career Recommendations",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var tracks = pm.response.json();",
+									"    if (Array.isArray(tracks) && tracks.length > 0) {",
+									"        pm.collectionVariables.set('sample_track_id', tracks[0].id);",
+									"        console.log('Saved sample_track_id:', tracks[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/careers/recommend",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "careers", "recommend"]
+						},
+						"description": "Triggers Gemini AI Career Intelligence Engine to generate 3 customized career pathways with match percentage, market demand, salary ranges, and day-in-the-life insights."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Saved Career Tracks",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/careers",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "careers"]
+						},
+						"description": "Fetches all saved career tracks for the authenticated student."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Career Track by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/careers/{{sample_track_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "careers", "{{sample_track_id}}"]
+						},
+						"description": "Fetches specific career track details by ID."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Skill Gap Analyzer",
+			"item": [
+				{
+					"name": "Analyze Skill Gap for Target Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"target_role\": \"AI Solutions Architect\",\n  \"track_id\": {{sample_track_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/skill-gap/analyze",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "skill-gap", "analyze"]
+						},
+						"description": "Compares student's verified skills against target industry benchmarks, computing match score, missing critical skills, and learning difficulty."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Latest Skill Gap Analysis",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/skill-gap",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "skill-gap"]
+						},
+						"description": "Retrieves the student's existing skill gap assessments."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Dynamic Milestone Roadmap",
+			"item": [
+				{
+					"name": "Generate Phased Action Roadmap",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var milestones = pm.response.json();",
+									"    if (Array.isArray(milestones) && milestones.length > 0 && milestones[0].tasks && milestones[0].tasks.length > 0) {",
+									"        pm.collectionVariables.set('sample_task_id', milestones[0].tasks[0].id);",
+									"        console.log('Saved sample_task_id:', milestones[0].tasks[0].id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"target_role\": \"Full Stack AI Engineer\",\n  \"target_duration_months\": 6\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/roadmap/generate",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "roadmap", "generate"]
+						},
+						"description": "Generates a dynamic 3-phase roadmap with actionable milestone tasks, estimated study hours, and curated learning resource URLs."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current Roadmap & Tasks",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/roadmap",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "roadmap"]
+						},
+						"description": "Retrieves the student's active roadmap with completion progress."
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Task Completion",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/roadmap/tasks/{{sample_task_id}}/complete?is_completed=true",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "roadmap", "tasks", "{{sample_task_id}}", "complete"],
+							"query": [
+								{
+									"key": "is_completed",
+									"value": "true"
+								}
+							]
+						},
+						"description": "Marks a specific roadmap milestone task as completed or pending."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6. What-If Career Simulator",
+			"item": [
+				{
+					"name": "Simulate Acquiring Skills & Projects",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hypothetical_skills\": [\"Kubernetes\", \"LangChain\", \"Vector Databases (Pinecone/Qdrant)\", \"System Design\"],\n  \"hypothetical_projects\": [\"Production RAG Pipeline with FastAPI and Weaviate\"],\n  \"target_role\": \"Lead AI Engineer\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/simulator/what-if",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "simulator", "what-if"]
+						},
+						"description": "Calculates match score improvement delta, projected salary increase, unlockable roles, and AI strategic verdict."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "7. Job Intelligence & ATS Resume Matching",
+			"item": [
+				{
+					"name": "Parse Job Description (JD)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"job_title\": \"Senior Full Stack Engineer (AI Platform)\",\n  \"company\": \"Stripe / OpenAI Ecosystem Partner\",\n  \"description_text\": \"We are looking for a Senior Full Stack Engineer with strong proficiency in Next.js, React, TypeScript, Python (FastAPI), PostgreSQL, and LLM integrations. Experience with Docker, Kubernetes, AWS, and building real-time collaborative interfaces is a major plus.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/jobs/parse-jd",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "jobs", "parse-jd"]
+						},
+						"description": "Analyzes raw job description text and extracts structured requirements, must-haves, nice-to-haves, and years of experience needed."
+					},
+					"response": []
+				},
+				{
+					"name": "Evaluate Job Readiness & ATS Score",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"job_title\": \"AI Application Engineer\",\n  \"company\": \"Scale AI\",\n  \"job_description\": \"Requirements: 2+ years building production applications with Python, FastAPI, React/Next.js, LangChain, Vector DBs, and Docker. Strong understanding of RESTful APIs, token optimization, and responsive design.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/jobs/readiness",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "jobs", "readiness"]
+						},
+						"description": "Computes ATS match percentage, keyword analysis (matched vs missing), bullet point enhancements, and personalized cover letter generator."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "8. AI Interaction History & Audit Logs",
+			"item": [
+				{
+					"name": "Get Student AI Audit Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{bearer_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/history/ai-logs",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "history", "ai-logs"]
+						},
+						"description": "Retrieves the chronological audit log of all AI prompts, actions, latency metrics, and responses generated for the user."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
