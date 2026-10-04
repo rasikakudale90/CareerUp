@@ -16,8 +16,8 @@ export function CircularProgress({
   value,
   size = 110,
   strokeWidth = 9,
-  color = "#8E705A",
-  trackColor = "rgba(239, 240, 248, 0.08)",
+  color = "var(--accent)",
+  trackColor = "var(--border-strong)",
   label,
   showPercent = true,
 }: CircularProgressProps) {
@@ -36,6 +36,7 @@ export function CircularProgress({
           stroke={trackColor}
           strokeWidth={strokeWidth}
           fill="transparent"
+          strokeOpacity={0.35}
         />
         {/* Progress Arc */}
         <circle
@@ -54,11 +55,11 @@ export function CircularProgress({
       {/* Center Label */}
       <div className="absolute flex flex-col items-center justify-center text-center">
         {showPercent && (
-          <span className="text-xl font-bold text-white tracking-tight">
+          <span className="text-xl font-bold text-[var(--text-primary)] tracking-tight">
             {Math.round(value)}%
           </span>
         )}
-        {label && <span className="text-[10px] text-[#BABBC3] font-medium">{label}</span>}
+        {label && <span className="text-[10px] text-[var(--text-secondary)] font-semibold">{label}</span>}
       </div>
     </div>
   );
