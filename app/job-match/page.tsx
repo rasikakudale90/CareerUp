@@ -64,6 +64,28 @@ workflow.add_node("executor", execute_tool)
 workflow.add_edge("planner", "executor")`,
     };
   }
+  if (s.includes("ai sdk") || s.includes("vercel ai")) {
+    return {
+      title: "Vercel AI SDK (Core, UI & Generative Streams)",
+      simId: "sim-aisdk",
+      boostPct: "+9% ATS Fit (97%)",
+      simDesc:
+        "Simulate full-stack AI streaming, React Server Actions with AI SDK Core/UI, structured tool calling (zod), and Generative UI components.",
+      roadmapPhase: "Phase 4: Capstone AI Product & Edge Streaming",
+      roadmapSprint: "Build Real-Time Multi-Modal AI Interface with Vercel AI SDK & Next.js 15",
+      bullet:
+        "Architected real-time streaming AI chat interface using Vercel AI SDK v3/v4 and streamText with multi-step tool execution, reducing TTFT to 210ms.",
+      codeSnippet: `import { streamText, tool } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { z } from 'zod';
+
+const result = streamText({
+  model: openai('gpt-4o'),
+  messages,
+  tools: { getWeather: tool({ ... }) }
+});`,
+    };
+  }
   if (s.includes("docker") || s.includes("container") || s.includes("k8s")) {
     return {
       title: "Docker Containerization & MLOps",
@@ -126,6 +148,7 @@ export default function JobMatchPage() {
     // Check simulated skills
     if (sName.includes("vector") && isSimulatedSkillActive("sim-vectordb")) return true;
     if (sName.includes("agent") && isSimulatedSkillActive("sim-langgraph")) return true;
+    if ((sName.includes("ai sdk") || sName.includes("sdk")) && (isSimulatedSkillActive("sim-aisdk") || isSimulatedSkillActive("sim-vectordb"))) return true;
     if (sName.includes("docker") && isSimulatedSkillActive("sim-docker")) return true;
     if (sName.includes("redis") && isSimulatedSkillActive("sim-redis")) return true;
     if (sName.includes("pytorch") && isSimulatedSkillActive("sim-pytorch")) return true;
