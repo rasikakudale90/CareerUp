@@ -30,9 +30,21 @@ os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 
 from backend.app.api.auth import router as auth_router
 from backend.app.api.resume import router as resume_router
+from backend.app.api.profile import router as profile_router
+from backend.app.api.careers import router as careers_router
+from backend.app.api.skill_gap import router as skill_gap_router
+from backend.app.api.roadmap import router as roadmap_router
+from backend.app.api.simulator import router as simulator_router
+from backend.app.api.jobs import router as jobs_router
 
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(resume_router, prefix="/api/v1")
+app.include_router(profile_router, prefix="/api/v1")
+app.include_router(careers_router, prefix="/api/v1")
+app.include_router(skill_gap_router, prefix="/api/v1")
+app.include_router(roadmap_router, prefix="/api/v1")
+app.include_router(simulator_router, prefix="/api/v1")
+app.include_router(jobs_router, prefix="/api/v1")
 
 @app.get("/api/health", tags=["Health"])
 def health_check():
