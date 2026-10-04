@@ -204,9 +204,61 @@ export default function ProfilePage() {
                 </div>
               </div>
             ))}
+        {/* AI Interaction History Section */}
+        <SpotlightCard className="rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] p-6 shadow-xl space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-[var(--accent)]" />
+              <h3 className="text-sm font-bold text-[var(--text-primary)]">AI Interaction History & Audit Trail</h3>
+            </div>
+            <span className="text-[10px] text-[var(--text-muted)] uppercase font-bold tracking-wider">
+              Gemini 2.5 Flash Verified
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            <div className="p-3.5 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-[var(--text-primary)]">Resume Parsing &amp; Career DNA Extraction</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-semibold">Processed</span>
+                </div>
+                <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">
+                  Extracted 94% Next.js proficiency, reactive frontend architecture, and recommended 92% match for AI Product Engineer.
+                </p>
+              </div>
+              <span className="text-[10px] text-[var(--text-muted)] shrink-0">Today at 09:45 AM</span>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-[var(--text-primary)]">Skill Gap Diagnostic Evaluation</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/15 text-blue-500 font-semibold">Analyzed</span>
+                </div>
+                <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">
+                  Identified Vector Databases &amp; LangGraph as top 2 critical blockers (~54 hours estimated learning time).
+                </p>
+              </div>
+              <span className="text-[10px] text-[var(--text-muted)] shrink-0">Today at 09:47 AM</span>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-[var(--text-primary)]">What-If Skill Acquisition Simulation</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-[var(--accent)]/15 text-[var(--accent)] font-semibold">Simulated</span>
+                </div>
+                <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">
+                  Tested LangGraph + Vector DB acquisition. Result: +14% hiring readiness and +$25,000 projected starting compensation.
+                </p>
+              </div>
+              <span className="text-[10px] text-[var(--text-muted)] shrink-0">Today at 09:50 AM</span>
+            </div>
           </div>
         </SpotlightCard>
       </div>
     </AppShell>
   );
 }
+

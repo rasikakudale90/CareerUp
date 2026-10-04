@@ -161,7 +161,7 @@ async function runComprehensiveSuite() {
   ];
 
   for (const r of routes) {
-    const url = `http://localhost:3001${r.path}`;
+    const url = `http://127.0.0.1:3000${r.path}`;
     try {
       const res = await fetch(url);
       assert(res.status === 200, `Route ${r.path} returns HTTP 200 OK`, `Got ${res.status}`);
@@ -191,7 +191,7 @@ async function runComprehensiveSuite() {
   ];
 
   for (const img of imagesToTest) {
-    const url = `http://localhost:3001${img}`;
+    const url = `http://127.0.0.1:3000${img}`;
     try {
       const res = await fetch(url);
       assert(res.status === 200, `Asset ${img} loads successfully (HTTP 200)`, `Status: ${res.status}`);

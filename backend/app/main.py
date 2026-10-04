@@ -36,6 +36,7 @@ from backend.app.api.skill_gap import router as skill_gap_router
 from backend.app.api.roadmap import router as roadmap_router
 from backend.app.api.simulator import router as simulator_router
 from backend.app.api.jobs import router as jobs_router
+from backend.app.api.history import router as history_router
 
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(resume_router, prefix="/api/v1")
@@ -45,6 +46,7 @@ app.include_router(skill_gap_router, prefix="/api/v1")
 app.include_router(roadmap_router, prefix="/api/v1")
 app.include_router(simulator_router, prefix="/api/v1")
 app.include_router(jobs_router, prefix="/api/v1")
+app.include_router(history_router, prefix="/api/v1")
 
 @app.get("/api/health", tags=["Health"])
 def health_check():
