@@ -32,6 +32,7 @@ export default function DashboardPage() {
     overallReadinessScore,
     completedTasksCount,
     totalTasksCount,
+    greeting,
   } = usePrototype();
 
   const topMatches = careerPaths.slice(0, 3);
@@ -39,7 +40,7 @@ export default function DashboardPage() {
 
   return (
     <AppShell
-      headerTitle={`Good morning, ${studentProfile.name.split(" ")[0]} 👋`}
+      headerTitle={`${greeting}, ${studentProfile.name.split(" ")[0]} 👋`}
       headerSubtitle="Your future is full of possibilities. Let's explore."
     >
       <div className="space-y-6">

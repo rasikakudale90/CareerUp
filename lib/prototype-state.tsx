@@ -64,15 +64,39 @@ interface PrototypeContextType {
   totalTasksCount: number;
   resetState: () => void;
   isLoaded: boolean;
+  greeting: string;
 }
 
 const PrototypeContext = createContext<PrototypeContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = "careerup_state_v1";
 
+export function getTimeBasedGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) {
+    return "Good morning";
+  } else if (hour >= 12 && hour < 17) {
+    return "Good afternoon";
+  } else if (hour >= 17 && hour < 22) {
+    return "Good evening";
+  } else {
+    return "Good evening";
+  }
+}
+
 export function PrototypeProvider({ children }: { children: ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [greeting, setGreeting] = useState<string>("Good day");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+
+  // Update greeting based on client-side time
+  useEffect(() => {
+    setGreeting(getTimeBasedGreeting());
+    const interval = setInterval(() => {
+      setGreeting(getTimeBasedGreeting());
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>({
     id: INITIAL_STUDENT_PROFILE.id,
     name: INITIAL_STUDENT_PROFILE.name,
@@ -352,6 +376,7 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
         totalTasksCount,
         resetState,
         isLoaded,
+        greeting,
       }}
     >
       {children}

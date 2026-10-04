@@ -36,7 +36,6 @@ async function runComprehensiveSuite() {
         "Upload Your Resume",
         "Explore 6 AI Career Tracks",
         "Inside the CareerUp Experience",
-        "Good morning,",
         "Your Career DNA",
         "Top Career Matches",
         "Skill Gap Analysis",
@@ -57,7 +56,7 @@ async function runComprehensiveSuite() {
       path: "/dashboard",
       name: "Student Command Center",
       markers: [
-        "Good morning, Aditi",
+        "Your future is full of possibilities",
         "Your Career DNA",
         "Top Career Matches",
         "What If Simulator",

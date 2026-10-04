@@ -25,7 +25,7 @@ import { SpotlightCard } from "@/components/motion/SpotlightCard";
 import { usePrototype } from "@/lib/prototype-state";
 
 export default function LandingPage() {
-  const { studentProfile, careerPaths, overallReadinessScore, roadmap } = usePrototype();
+  const { studentProfile, careerPaths, overallReadinessScore, roadmap, greeting } = usePrototype();
   const heroRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const subheadRef = useRef<HTMLParagraphElement>(null);
@@ -401,7 +401,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-[var(--border-color)] gap-4">
               <div>
                 <div className="text-lg sm:text-xl font-bold text-[var(--text-primary)] flex items-center gap-2">
-                  Good morning, {studentProfile.name.split(" ")[0]} 👋
+                  {greeting}, {studentProfile.name.split(" ")[0]} 👋
                 </div>
                 <div className="text-xs text-[var(--text-secondary)]">Your future is full of possibilities. Let&apos;s explore.</div>
               </div>

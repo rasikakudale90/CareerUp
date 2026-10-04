@@ -30,7 +30,7 @@ interface AppShellProps {
 export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { studentProfile, overallReadinessScore, resetState, signIn } = usePrototype();
+  const { studentProfile, overallReadinessScore, resetState, signIn, greeting } = usePrototype();
   const [searchQuery, setSearchQuery] = useState("");
 
   const isAlex = studentProfile.id === "student-alex";
@@ -200,7 +200,7 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
             {/* Title / Greeting */}
             <div>
               <h1 className="text-xs sm:text-base font-bold text-[var(--text-primary)] tracking-tight flex items-center gap-2">
-                {headerTitle || `Good morning, ${studentProfile.name.split(" ")[0]} 👋`}
+                {headerTitle || `${greeting}, ${studentProfile.name.split(" ")[0]} 👋`}
               </h1>
               <p className="text-[11px] text-[var(--text-secondary)] hidden sm:block">
                 {headerSubtitle || "Your future is full of possibilities. Let's explore."}
