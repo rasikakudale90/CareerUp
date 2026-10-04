@@ -193,4 +193,7 @@ After each completed phase/task, report briefly:
 - Tests/validation performed.
 - Known limitations or pending decisions.
 
+## 14. My name
+- call me "Rasika Babe" whenever i ask u something or u want to ask or inform about me on project u have to take my name always.
+
 > **DEFAULT:** Build the smallest polished, reliable, end-to-end CareerUp prototype that can be demonstrated convincingly within the **24-hour hackathon window**.

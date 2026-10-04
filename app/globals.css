@@ -1,29 +1,55 @@
 @import "tailwindcss";
 
 @layer base {
-  /* LIGHT THEME (Default) */
+  /* LIGHT THEME (Off-White / Warm Neutral Surfaces) */
   :root {
+    /* Raw Palette Tokens */
+    --color-ink-950: #1A1917;
+    --color-paper-50: #EFF0F8;
+    --color-earth-800: #49423A;
+    --color-mist-300: #BABBC3;
+    --color-earth-900: #47382A;
+    --color-clay-600: #8E705A;
+
+    /* Semantic Backgrounds */
     --bg-primary: #EFF0F8;
     --bg-secondary: #F7F7FA;
+    --bg-tertiary: #E8E8EE;
     --bg-surface: #FFFFFF;
     --bg-card: #FFFFFF;
     --bg-card-subtle: #F2F2F6;
     --bg-nav: rgba(255, 255, 255, 0.92);
     --bg-overlay: rgba(255, 255, 255, 0.85);
 
+    /* Semantic Typography */
     --text-primary: #1A1917;
     --text-secondary: #49423A;
     --text-muted: #6E6D73;
     --text-inverse: #EFF0F8;
+    --text-on-dark-muted: #BABBC3;
 
+    /* Borders */
     --border-color: rgba(26, 25, 23, 0.12);
     --border-subtle: rgba(26, 25, 23, 0.06);
-    --border-strong: rgba(26, 25, 23, 0.25);
+    --border-strong: rgba(26, 25, 23, 0.22);
+    --border-dark: rgba(239, 240, 248, 0.14);
 
+    /* Accents (Clay / Warm Earth) */
     --accent: #8E705A;
+    --accent-dark: #47382A;
     --accent-hover: #A6866D;
     --accent-soft: rgba(142, 112, 90, 0.14);
     --accent-glow: rgba(142, 112, 90, 0.25);
+
+    /* Semantic States */
+    --color-success: #4D6B59;
+    --color-success-soft: #E3ECE5;
+    --color-warning: #9A7650;
+    --color-warning-soft: #F0E7DC;
+    --color-danger: #9A5750;
+    --color-danger-soft: #F1E2E0;
+    --color-info: #667482;
+    --color-info-soft: #E5E9ED;
 
     --spotlight-glow: rgba(142, 112, 90, 0.16);
 
@@ -31,13 +57,14 @@
     --font-body: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
-  /* DARK THEME */
+  /* DARK THEME (Near-Black / Charcoal Cinematic Surfaces) */
   .dark {
     --bg-primary: #121110;
     --bg-secondary: #161514;
+    --bg-tertiary: #1E1D1A;
     --bg-surface: #1A1917;
     --bg-card: #1A1917;
-    --bg-card-subtle: #23211E;
+    --bg-card-subtle: #24221F;
     --bg-nav: rgba(26, 25, 23, 0.90);
     --bg-overlay: rgba(18, 17, 16, 0.88);
 
@@ -45,15 +72,27 @@
     --text-secondary: #BABBC3;
     --text-muted: #8E8F99;
     --text-inverse: #1A1917;
+    --text-on-dark-muted: #BABBC3;
 
     --border-color: rgba(239, 240, 248, 0.12);
     --border-subtle: rgba(239, 240, 248, 0.06);
     --border-strong: rgba(239, 240, 248, 0.25);
+    --border-dark: rgba(239, 240, 248, 0.18);
 
     --accent: #8E705A;
+    --accent-dark: #47382A;
     --accent-hover: #A6866D;
     --accent-soft: rgba(142, 112, 90, 0.25);
     --accent-glow: rgba(142, 112, 90, 0.35);
+
+    --color-success: #679277;
+    --color-success-soft: rgba(77, 107, 89, 0.25);
+    --color-warning: #C49767;
+    --color-warning-soft: rgba(154, 118, 80, 0.25);
+    --color-danger: #C47167;
+    --color-danger-soft: rgba(154, 87, 80, 0.25);
+    --color-info: #8598AB;
+    --color-info-soft: rgba(102, 116, 130, 0.25);
 
     --spotlight-glow: rgba(142, 112, 90, 0.22);
   }
@@ -117,12 +156,25 @@ body {
 .btn-clay {
   background-color: var(--accent);
   color: #FFFFFF;
+  border-radius: 9999px;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .btn-clay:hover {
   background-color: var(--accent-hover);
   transform: translateY(-1px);
   box-shadow: 0 0 25px var(--accent-glow);
+}
+
+.btn-outline-pill {
+  border: 1px solid var(--border-color);
+  border-radius: 9999px;
+  background-color: transparent;
+  color: var(--text-primary);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-outline-pill:hover {
+  border-color: var(--accent);
+  background-color: var(--accent-soft);
 }
 
 /* Shimmer Animation */
