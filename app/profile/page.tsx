@@ -41,7 +41,6 @@ export default function ProfilePage() {
     removeAvatar,
     updateProfileFromResume,
     signOut,
-    signIn,
   } = usePrototype();
 
   const [activeCategory, setActiveCategory] = useState<string>("All");
@@ -57,8 +56,6 @@ export default function ProfilePage() {
     activeCategory === "All"
       ? studentProfile.skills
       : studentProfile.skills.filter((s) => s.category === activeCategory);
-
-  const isAlex = studentProfile.id === "student-alex";
 
   // Handle Photo File Upload
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,7 +103,29 @@ export default function ProfilePage() {
     setTimeout(() => {
       // Intelligent extractor based on file hints or custom student
       if (fileNameLower.includes("alex") || fileNameLower.includes("morgan") || fileNameLower.includes("data")) {
-        signIn("", "", "alex");
+        updateProfileFromResume({
+          name: "Alex Morgan",
+          title: "Aspiring Applied Machine Learning Engineer",
+          university: "UC Berkeley / CS 2025",
+          degree: "B.S. in Computer Science",
+          graduationYear: "2025",
+          summary: "Data scientist and machine learning practitioner with strong mathematical modeling, Python, and SQL experience.",
+          careerDNASummary: "Analytical thinker with deep statistical foundations, seeking applied machine learning engineering roles.",
+          radarScores: {
+            technical: 82,
+            analytical: 88,
+            communication: 76,
+            leadership: 70,
+            domainKnowledge: 84,
+          },
+          skills: [
+            { name: "Python & Pandas", category: "Technical", proficiency: 90, verified: true },
+            { name: "SQL & Data Warehouses", category: "Technical", proficiency: 88, verified: true },
+            { name: "PyTorch & Scikit-Learn", category: "Technical", proficiency: 78, verified: true },
+            { name: "Statistical Modeling", category: "Analytical", proficiency: 85, verified: true },
+            { name: "Technical Writing", category: "Communication", proficiency: 80, verified: true },
+          ],
+        });
       } else if (fileNameLower.includes("rasika")) {
         updateProfileFromResume({
           name: "Rasika Kudale",
@@ -455,26 +474,17 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
             <div className="p-4 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] space-y-1">
               <span className="text-[10px] uppercase font-bold text-[var(--text-muted)] block">Signed In As</span>
-              <span className="text-xs font-bold text-[var(--text-primary)] block truncate">{currentUser?.email || "student@iit.ac.in"}</span>
+              <span className="text-xs font-bold text-[var(--text-primary)] block truncate">{currentUser?.email || "student@careerup.ai"}</span>
               <span className="text-[10px] text-[var(--text-secondary)]">Role: {currentUser?.role || "student"}</span>
             </div>
 
             <div className="p-4 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] space-y-1">
-              <span className="text-[10px] uppercase font-bold text-[var(--text-muted)] block">Candidate Persona</span>
+              <span className="text-[10px] uppercase font-bold text-[var(--text-muted)] block">Candidate Account</span>
               <span className="text-xs font-bold text-[var(--text-primary)] block">{studentProfile.name}</span>
-              <button
-                onClick={() => {
-                  if (isAlex) {
-                    signIn("aditi.sharma@iit.ac.in", "", "aditi");
-                  } else {
-                    signIn("alex.morgan@berkeley.edu", "", "alex");
-                  }
-                }}
-                className="text-[10px] text-[var(--accent)] font-semibold hover:underline flex items-center gap-1"
-              >
-                <Users className="h-3 w-3" />
-                <span>Switch to {isAlex ? "Aditi Sharma" : "Alex Morgan"}</span>
-              </button>
+              <span className="text-[10px] text-emerald-500 font-semibold flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3" />
+                <span>Active Verified Session</span>
+              </span>
             </div>
 
             <div className="p-4 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex flex-col justify-between">

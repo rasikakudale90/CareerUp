@@ -10,7 +10,6 @@ import {
   ArrowRight,
   Loader2,
   Cpu,
-  Bot,
 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { SpotlightCard } from "@/components/motion/SpotlightCard";
@@ -18,9 +17,9 @@ import { usePrototype } from "@/lib/prototype-state";
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { signIn, updateProfileFromResume } = usePrototype();
+  const { updateProfileFromResume } = usePrototype();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [selectedFile, setSelectedFile] = useState<string | null>("Aditi_Sharma_Resume_2026.pdf");
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [uploadedBlob, setUploadedBlob] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -40,25 +39,21 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleSelectPersona = (fileName: string, persona: "aditi" | "alex") => {
-    setSelectedFile(fileName);
-    setUploadedBlob(null);
-    if (persona === "alex") {
-      signIn("alex.morgan@stanford.edu", "", "alex");
-    } else {
-      signIn("aditi.sharma@iit.ac.in", "", "aditi");
-    }
-  };
-
   const handleStartAnalysis = async () => {
+    if (!selectedFile && !uploadedBlob) {
+      fileInputRef.current?.click();
+      return;
+    }
+
     setIsAnalyzing(true);
     setCurrentStep(0);
 
-    // If a custom file was chosen, parse and update profile
     if (uploadedBlob) {
-      const fileNameLower = uploadedBlob.name.toLowerCase();
+      const fileName = uploadedBlob.name;
+      const cleanName = fileName.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+      const formattedName = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+
       try {
-        // Asynchronously notify backend
         const formData = new FormData();
         formData.append("file", uploadedBlob);
         fetch("http://localhost:8000/api/v1/resume/upload", {
@@ -67,60 +62,28 @@ export default function OnboardingPage() {
         }).catch(() => {});
       } catch {}
 
-      if (fileNameLower.includes("alex") || fileNameLower.includes("morgan") || fileNameLower.includes("data")) {
-        signIn("", "", "alex");
-      } else if (fileNameLower.includes("rasika")) {
-        updateProfileFromResume({
-          name: "Rasika Kudale",
-          title: "AI Systems & Full-Stack Architect",
-          university: "Top Tech University",
-          degree: "B.Tech Computer Science & AI",
-          graduationYear: "2026",
-          summary: "AI systems engineer with deep expertise in Next.js, LLM multi-agent pipelines, FastAPI, and reactive full-stack web applications.",
-          careerDNASummary: "Pioneering builder with strong systems engineering foundations and exceptional mastery of full-stack AI orchestration.",
-          radarScores: {
-            technical: 94,
-            analytical: 90,
-            communication: 88,
-            leadership: 85,
-            domainKnowledge: 88,
-          },
-          skills: [
-            { name: "Next.js & React 19", category: "Technical", proficiency: 96, verified: true },
-            { name: "FastAPI & Python 3.12", category: "Technical", proficiency: 92, verified: true },
-            { name: "LangGraph & Agentic Loops", category: "Technical", proficiency: 90, verified: true },
-            { name: "PostgreSQL & Vector Databases", category: "Technical", proficiency: 88, verified: true },
-            { name: "Tailwind CSS & Design Tokens", category: "Technical", proficiency: 95, verified: true },
-            { name: "System Architecture", category: "Analytical", proficiency: 92, verified: true },
-            { name: "Prompt Engineering & Evaluation", category: "Analytical", proficiency: 90, verified: true },
-            { name: "Technical Leadership", category: "Leadership", proficiency: 88, verified: true },
-          ],
-        });
-      } else {
-        const cleanName = uploadedBlob.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
-        updateProfileFromResume({
-          name: cleanName.charAt(0).toUpperCase() + cleanName.slice(1),
-          title: "AI Product & Software Engineer",
-          summary: `Extracted candidate profile from ${uploadedBlob.name}. High demonstrated capability across modern software architecture and AI integrations.`,
-          careerDNASummary: `Multidimensional candidate evaluated from ${uploadedBlob.name}. High fit for AI Product Engineering and Fullstack AI development.`,
-          radarScores: {
-            technical: 86,
-            analytical: 84,
-            communication: 82,
-            leadership: 78,
-            domainKnowledge: 80,
-          },
-          skills: [
-            { name: "React & Next.js", category: "Technical", proficiency: 90, verified: true },
-            { name: "TypeScript & JavaScript", category: "Technical", proficiency: 88, verified: true },
-            { name: "Python & FastAPI", category: "Technical", proficiency: 85, verified: true },
-            { name: "SQL & Relational Databases", category: "Technical", proficiency: 82, verified: true },
-            { name: "AI APIs & Tool Calling", category: "Technical", proficiency: 86, verified: true },
-            { name: "Problem Decomposition", category: "Analytical", proficiency: 85, verified: true },
-            { name: "Technical Communication", category: "Communication", proficiency: 80, verified: true },
-          ],
-        });
-      }
+      updateProfileFromResume({
+        name: formattedName,
+        title: "AI Product & Software Engineer",
+        summary: `Extracted candidate profile from ${uploadedBlob.name}. High demonstrated capability across modern software architecture and AI integrations.`,
+        careerDNASummary: `Multidimensional candidate evaluated from ${uploadedBlob.name}. High fit for AI Product Engineering and Fullstack AI development.`,
+        radarScores: {
+          technical: 86,
+          analytical: 84,
+          communication: 82,
+          leadership: 78,
+          domainKnowledge: 80,
+        },
+        skills: [
+          { name: "React & Next.js", category: "Technical", proficiency: 90, verified: true },
+          { name: "TypeScript & JavaScript", category: "Technical", proficiency: 88, verified: true },
+          { name: "Python & FastAPI", category: "Technical", proficiency: 85, verified: true },
+          { name: "SQL & Relational Databases", category: "Technical", proficiency: 82, verified: true },
+          { name: "AI APIs & Tool Calling", category: "Technical", proficiency: 86, verified: true },
+          { name: "Problem Decomposition", category: "Analytical", proficiency: 85, verified: true },
+          { name: "Technical Communication", category: "Communication", proficiency: 80, verified: true },
+        ],
+      });
     }
 
     const interval = setInterval(() => {
@@ -139,7 +102,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex flex-col relative overflow-hidden selection:bg-[var(--accent)] selection:text-white">
-      {/* ATMOSPHERIC BACKGROUND (career2.png student collaboration) */}
+      {/* ATMOSPHERIC BACKGROUND */}
       <div className="fixed inset-0 pointer-events-none z-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -194,7 +157,7 @@ export default function OnboardingPage() {
                   Click to upload or drag and drop your resume
                 </div>
                 <div className="text-xs text-[var(--text-muted)]">
-                  Supports PDF, DOCX, TXT (Browse any resume from your device)
+                  Supports PDF, DOCX, TXT (Browse any resume file from your computer)
                 </div>
 
                 {selectedFile && (
@@ -206,58 +169,14 @@ export default function OnboardingPage() {
                 )}
               </div>
 
-              {/* Sample Presets */}
-              <div>
-                <span className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">
-                  Or test with sample student personas:
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <button
-                    onClick={() => handleSelectPersona("Aditi_Sharma_Resume_2026.pdf", "aditi")}
-                    className={`p-3.5 rounded-2xl text-left border transition-all flex items-center justify-between card-hover-effect ${
-                      selectedFile === "Aditi_Sharma_Resume_2026.pdf"
-                        ? "bg-[var(--accent)]/15 border-[var(--accent)] text-[var(--text-primary)] shadow-lg"
-                        : "bg-[var(--bg-card-subtle)] border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--border-color)]"
-                    }`}
-                  >
-                    <div>
-                      <div className="text-xs font-bold text-[var(--text-primary)]">Aditi Sharma (Default)</div>
-                      <div className="text-[11px] text-[var(--text-secondary)]">Full-Stack &amp; Applied AI • IIT / CS 2026</div>
-                    </div>
-                    <CheckCircle2
-                      className={`h-4 w-4 ${
-                        selectedFile === "Aditi_Sharma_Resume_2026.pdf" ? "text-[var(--accent)]" : "opacity-0"
-                      }`}
-                    />
-                  </button>
-
-                  <button
-                    onClick={() => handleSelectPersona("Alex_Morgan_Data_Resume.pdf", "alex")}
-                    className={`p-3.5 rounded-2xl text-left border transition-all flex items-center justify-between card-hover-effect ${
-                      selectedFile === "Alex_Morgan_Data_Resume.pdf"
-                        ? "bg-[var(--accent)]/15 border-[var(--accent)] text-[var(--text-primary)] shadow-lg"
-                        : "bg-[var(--bg-card-subtle)] border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--border-color)]"
-                    }`}
-                  >
-                    <div>
-                      <div className="text-xs font-bold text-[var(--text-primary)]">Alex Morgan</div>
-                      <div className="text-[11px] text-[var(--text-secondary)]">Python, SQL &amp; Data Foundations • CS 2025</div>
-                    </div>
-                    <CheckCircle2
-                      className={`h-4 w-4 ${
-                        selectedFile === "Alex_Morgan_Data_Resume.pdf" ? "text-[var(--accent)]" : "opacity-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-              </div>
-
               {/* Start Analysis Button */}
               <button
                 onClick={handleStartAnalysis}
                 className="w-full py-4 rounded-2xl bg-[var(--accent)] text-white font-semibold text-sm hover:bg-[var(--accent-hover)] transition-all flex items-center justify-center gap-2 shadow-2xl hover:scale-[1.01] active:scale-[0.99]"
               >
-                <span className="shimmer-text">Generate Career DNA &amp; Roadmap</span>
+                <span className="shimmer-text">
+                  {selectedFile ? "Generate Career DNA & Roadmap" : "Browse & Upload Resume"}
+                </span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>

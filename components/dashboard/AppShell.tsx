@@ -16,12 +16,15 @@ import {
   Bell,
   ChevronRight,
   RotateCcw,
-  Users,
   LogOut,
-  Upload,
+  Lock,
+  ArrowRight,
+  ShieldAlert,
 } from "lucide-react";
 import { usePrototype } from "@/lib/prototype-state";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { Navbar } from "@/components/layout/Navbar";
+import { SpotlightCard } from "@/components/motion/SpotlightCard";
 
 interface AppShellProps {
   children: ReactNode;
@@ -34,18 +37,17 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
   const router = useRouter();
   const {
     studentProfile,
+    currentUser,
     overallReadinessScore,
     resetState,
-    signIn,
     signOut,
     isAuthenticated,
+    isLoaded,
     unreadNotificationsCount,
     greeting,
   } = usePrototype();
 
   const [searchQuery, setSearchQuery] = useState("");
-
-  const isAlex = studentProfile.id === "student-alex";
 
   const menuItems = [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -73,18 +75,70 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
     else router.push("/career");
   };
 
-  const handleTogglePersona = () => {
-    if (isAlex) {
-      signIn("aditi.sharma@iit.ac.in", "", "aditi");
-    } else {
-      signIn("alex.morgan@stanford.edu", "", "alex");
-    }
-  };
-
   const handleSignOut = () => {
     signOut();
     router.push("/");
   };
+
+  // STRICT AUTH GUARD: If user is not authenticated, do not show private candidate dashboard/data!
+  if (isLoaded && !isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex flex-col relative overflow-hidden">
+        {/* ATMOSPHERIC BACKGROUND */}
+        <div className="fixed inset-0 pointer-events-none z-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/career1.png"
+            alt="Cinematic Landscape"
+            className="w-full h-full object-cover object-center opacity-15 filter blur-[2px] scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)]/85 to-[var(--bg-primary)]/70" />
+        </div>
+
+        <div className="relative z-20">
+          <Navbar />
+        </div>
+
+        <main className="flex-1 flex items-center justify-center p-4 relative z-10 my-8">
+          <div className="w-full max-w-md">
+            <SpotlightCard className="p-8 sm:p-10 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-2xl text-center space-y-6">
+              <div className="w-16 h-16 rounded-2xl bg-[var(--accent)]/15 text-[var(--accent)] flex items-center justify-center mx-auto border border-[var(--accent)]/30 shadow-xl">
+                <Lock className="h-8 w-8" />
+              </div>
+
+              <div>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/30">
+                  Authentication Required
+                </span>
+                <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight mt-2">
+                  Protected Career Center
+                </h2>
+                <p className="text-xs text-[var(--text-secondary)] mt-1.5 leading-relaxed">
+                  You are currently logged out. Please sign in to access your personalized Career DNA, real-time skill gaps, and learning roadmap.
+                </p>
+              </div>
+
+              <div className="space-y-3 pt-2">
+                <Link
+                  href="/auth/signin"
+                  className="w-full py-3.5 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all"
+                >
+                  <span className="shimmer-text">Sign In to Your Account</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href="/auth/register"
+                  className="w-full py-3.5 rounded-xl bg-[var(--bg-card-subtle)] hover:bg-[var(--border-color)] border border-[var(--border-color)] text-xs font-semibold text-[var(--text-primary)] flex items-center justify-center transition-colors"
+                >
+                  Create New Student Profile
+                </Link>
+              </div>
+            </SpotlightCard>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex relative overflow-hidden selection:bg-[var(--accent)] selection:text-white transition-colors duration-300">
@@ -117,22 +171,6 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
                 </span>
               </span>
             </Link>
-          </div>
-
-          {/* Quick Persona Switcher Bar in Sidebar */}
-          <div className="px-4 pt-3 pb-1">
-            <button
-              onClick={handleTogglePersona}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-2xl bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] text-xs transition-all hover:border-[var(--accent)]"
-              title="Switch Persona between Aditi & Alex"
-            >
-              <div className="flex items-center gap-2">
-                <Users className="h-3.5 w-3.5 text-[var(--accent)]" />
-                <span className="text-[11px] font-medium text-[var(--text-secondary)]">Persona:</span>
-                <span className="text-[11px] font-bold text-[var(--text-primary)]">{isAlex ? "Alex" : "Aditi"}</span>
-              </div>
-              <span className="text-[10px] uppercase font-bold text-[var(--accent)] hover:underline">Switch</span>
-            </button>
           </div>
 
           {/* Nav List */}
@@ -243,17 +281,6 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
 
           {/* Right Controls */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Quick Switch Persona Pill (Mobile & Desktop) */}
-            <button
-              onClick={handleTogglePersona}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-[var(--accent)] text-xs text-[var(--text-primary)] transition-all hover:scale-105 active:scale-95 shadow-sm"
-              title="Toggle Persona"
-            >
-              <Users className="h-3.5 w-3.5 text-[var(--accent)]" />
-              <span className="hidden sm:inline text-[11px] font-medium text-[var(--text-secondary)]">Persona:</span>
-              <span className="text-[11px] font-bold">{isAlex ? "Alex" : "Aditi"}</span>
-            </button>
-
             {/* Theme Toggle Button */}
             <ThemeToggle />
 
@@ -269,7 +296,7 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
               />
             </form>
 
-            {/* Notification Bell (Correctly routing to /notifications) */}
+            {/* Notification Bell */}
             <Link
               href="/notifications"
               className="p-2 rounded-full bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all hover:scale-110 active:scale-95 relative"

@@ -43,7 +43,7 @@ export function getAIAvatarUrl(name: string, style: "bottts" | "adventurer" | "i
 interface PrototypeContextType {
   isAuthenticated: boolean;
   currentUser: AuthUser | null;
-  signIn: (email: string, password?: string, persona?: "aditi" | "alex") => boolean;
+  signIn: (email: string, password?: string) => boolean;
   signUp: (data: SignUpData) => boolean;
   signOut: () => void;
   studentProfile: StudentProfile;
@@ -89,7 +89,7 @@ interface PrototypeContextType {
 
 const PrototypeContext = createContext<PrototypeContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_KEY = "careerup_state_v2";
+const LOCAL_STORAGE_KEY = "careerup_state_v3";
 
 export function getTimeBasedGreeting(): string {
   const hour = new Date().getHours();
@@ -121,7 +121,7 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>({
     id: INITIAL_STUDENT_PROFILE.id,
     name: INITIAL_STUDENT_PROFILE.name,
-    email: "aditi.sharma@iit.ac.in",
+    email: "student@careerup.ai",
     avatarUrl: INITIAL_STUDENT_PROFILE.avatarUrl,
     role: "student",
   });
@@ -144,13 +144,13 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
   // Load from LocalStorage on mount
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEY) || localStorage.getItem("careerup_state_v1");
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY) || localStorage.getItem("careerup_state_v2");
       if (saved) {
         const parsed = JSON.parse(saved);
         if (typeof parsed.isAuthenticated === "boolean") {
           setIsAuthenticated(parsed.isAuthenticated);
         }
-        if (parsed.currentUser) {
+        if (parsed.currentUser !== undefined) {
           setCurrentUser(parsed.currentUser);
         }
         if (parsed.studentProfile) {
@@ -228,74 +228,28 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
 
   const selectedCareer = careerPaths.find((c) => c.id === selectedCareerId) || careerPaths[0];
 
-  const signIn = (email: string, password?: string, persona?: "aditi" | "alex") => {
-    if (persona === "alex") {
-      const alexProfile: StudentProfile = {
-        id: "student-alex",
-        name: "Alex Morgan",
-        avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80",
-        title: "Aspiring Applied Machine Learning Engineer",
-        university: "UC Berkeley / CS 2025",
-        graduationYear: "2025",
-        degree: "B.S. in Computer Science",
-        summary: "Data scientist and machine learning practitioner with strong mathematical modeling, Python, and SQL experience.",
-        skills: [
-          { name: "Python & Pandas", category: "Technical", proficiency: 90, verified: true },
-          { name: "SQL & Data Warehouses", category: "Technical", proficiency: 88, verified: true },
-          { name: "PyTorch & Scikit-Learn", category: "Technical", proficiency: 78, verified: true },
-          { name: "Statistical Modeling", category: "Analytical", proficiency: 85, verified: true },
-          { name: "Technical Writing", category: "Communication", proficiency: 80, verified: true },
-        ],
-        radarScores: {
-          technical: 82,
-          analytical: 88,
-          communication: 76,
-          leadership: 70,
-          domainKnowledge: 84,
-        },
-        projects: [
-          {
-            id: "p-alex-1",
-            title: "MarketPulse — Stock Sentiment Predictor",
-            description: "Built transformer pipeline analyzing financial SEC filings and Reddit mentions.",
-            technologies: ["Python", "HuggingFace", "FastAPI", "PostgreSQL"],
-            metrics: "Achieved 78% directional accuracy in backtests",
-          },
-        ],
-        experience: [
-          {
-            role: "Data Science Intern",
-            company: "QuantEdge Analytics",
-            period: "June 2025 – August 2025",
-            highlights: ["Engineered features for 10M+ rows of transactional data."],
-          },
-        ],
-        careerDNASummary: "Analytical thinker with deep statistical foundations, seeking applied machine learning engineering roles.",
-        strengths: ["Strong math & probability", "Fast data pipelining", "Clean Python engineering"],
-        blindspots: ["Frontend UI design", "Kubernetes cluster administration"],
-      };
+  // Strictly ONE Single User Sign-In (No persona switching)
+  const signIn = (email: string, password?: string) => {
+    const userEmail = email.trim() || "student@careerup.ai";
+    const userName = userEmail.includes("@")
+      ? userEmail.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+      : "Student Candidate";
 
-      setStudentProfile(alexProfile);
-      setCurrentUser({
-        id: "student-alex",
-        name: "Alex Morgan",
-        email: email || "alex.morgan@berkeley.edu",
-        avatarUrl: alexProfile.avatarUrl,
-        role: "student",
-      });
-      setSelectedCareerId("data-scientist-applied-ml");
-    } else {
-      setStudentProfile(INITIAL_STUDENT_PROFILE);
-      setCurrentUser({
-        id: INITIAL_STUDENT_PROFILE.id,
-        name: INITIAL_STUDENT_PROFILE.name,
-        email: email || "aditi.sharma@iit.ac.in",
-        avatarUrl: INITIAL_STUDENT_PROFILE.avatarUrl,
-        role: "student",
-      });
-      setSelectedCareerId("ai-product-engineer");
-    }
+    const userProfile: StudentProfile = {
+      ...INITIAL_STUDENT_PROFILE,
+      id: `user-${Date.now()}`,
+      name: userName,
+      avatarUrl: getAIAvatarUrl(userName),
+    };
 
+    setStudentProfile(userProfile);
+    setCurrentUser({
+      id: userProfile.id,
+      name: userName,
+      email: userEmail,
+      avatarUrl: userProfile.avatarUrl,
+      role: "student",
+    });
     setIsAuthenticated(true);
     return true;
   };
@@ -307,10 +261,10 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
       id: `student-${Date.now()}`,
       name: data.name,
       avatarUrl: avatar,
-      university: data.university || "Global Tech Scholar",
+      university: data.university || "Global University",
       degree: data.degree || "B.Tech Computer Science",
       graduationYear: data.graduationYear || "2026",
-      summary: `Motivated student at ${data.university || "Global University"} preparing for high-impact ${data.targetRole || "AI Software Engineering"} positions.`,
+      summary: `Motivated student at ${data.university || "University"} targeting ${data.targetRole || "AI Engineering"} positions.`,
     };
 
     setStudentProfile(newProfile);
@@ -496,7 +450,6 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
         readinessDelta: Math.round(s.impactScore * 0.4),
       }));
 
-      // Add to phase 2 or create a specialized sprint
       return prev.map((milestone, idx) => {
         if (idx === 1) {
           return {
@@ -560,7 +513,7 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
     setCurrentUser({
       id: INITIAL_STUDENT_PROFILE.id,
       name: INITIAL_STUDENT_PROFILE.name,
-      email: "aditi.sharma@iit.ac.in",
+      email: "student@careerup.ai",
       avatarUrl: INITIAL_STUDENT_PROFILE.avatarUrl,
       role: "student",
     });
@@ -580,6 +533,7 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
     );
     try {
       localStorage.removeItem(LOCAL_STORAGE_KEY);
+      localStorage.removeItem("careerup_state_v2");
       localStorage.removeItem("careerup_state_v1");
     } catch {
       // ignore

@@ -19,32 +19,25 @@ import { usePrototype } from "@/lib/prototype-state";
 export default function SignInPage() {
   const router = useRouter();
   const { signIn } = usePrototype();
-  const [email, setEmail] = useState("aditi.sharma@stanford.edu");
-  const [password, setPassword] = useState("••••••••••••");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email.trim()) return;
+
     setLoading(true);
     setTimeout(() => {
-      signIn(email, password, "aditi");
+      signIn(email, password);
       setLoading(false);
       router.push("/dashboard");
     }, 600);
   };
 
-  const handleQuickPersona = (persona: "aditi" | "alex") => {
-    setLoading(true);
-    setTimeout(() => {
-      signIn("", "", persona);
-      setLoading(false);
-      router.push("/dashboard");
-    }, 400);
-  };
-
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex flex-col relative overflow-hidden selection:bg-[var(--accent)] selection:text-white">
-      {/* ATMOSPHERIC BACKGROUND (career2.png & career1.png hybrid) */}
+      {/* ATMOSPHERIC BACKGROUND */}
       <div className="fixed inset-0 pointer-events-none z-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -71,31 +64,6 @@ export default function SignInPage() {
               <p className="text-xs text-[var(--text-secondary)] mt-1.5">
                 Access your personalized Career DNA, skill roadmap, and live job matches.
               </p>
-            </div>
-
-            {/* Quick Demo Personas */}
-            <div className="mb-6 pb-6 border-b border-[var(--border-color)] space-y-2.5">
-              <span className="block text-[11px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
-                ⚡ Quick 1-Click Demo Sign In:
-              </span>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleQuickPersona("aditi")}
-                  className="p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--accent)]/40 hover:border-[var(--accent)] hover:bg-[var(--accent)]/10 transition-all text-left text-xs"
-                >
-                  <span className="font-bold text-[var(--text-primary)] block">Aditi Sharma</span>
-                  <span className="text-[10px] text-[var(--accent)]">AI Product Eng (92%)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickPersona("alex")}
-                  className="p-2.5 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] hover:border-[var(--accent)] hover:bg-[var(--accent)]/10 transition-all text-left text-xs"
-                >
-                  <span className="font-bold text-[var(--text-primary)] block">Alex Morgan</span>
-                  <span className="text-[10px] text-[var(--text-secondary)]">Applied ML (88%)</span>
-                </button>
-              </div>
             </div>
 
             {/* Form */}
