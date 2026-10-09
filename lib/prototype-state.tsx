@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import {
   StudentProfile,
   CareerPath,
@@ -484,21 +484,26 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
   };
 
   // Notifications
-  const markNotificationRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, unread: false } : n))
-    );
-  };
+  const markNotificationRead = useCallback((id: string) => {
+    setNotifications((prev) => {
+      const target = prev.find((n) => n.id === id);
+      if (!target || !target.unread) return prev;
+      return prev.map((n) => (n.id === id ? { ...n, unread: false } : n));
+    });
+  }, []);
 
-  const markAllNotificationsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
-  };
+  const markAllNotificationsRead = useCallback(() => {
+    setNotifications((prev) => {
+      if (!prev.some((n) => n.unread)) return prev;
+      return prev.map((n) => (n.unread ? { ...n, unread: false } : n));
+    });
+  }, []);
 
-  const clearAllNotifications = () => {
+  const clearAllNotifications = useCallback(() => {
     setNotifications([]);
-  };
+  }, []);
 
-  const addNotification = (notification: Omit<AIInsight, "id" | "date">) => {
+  const addNotification = useCallback((notification: Omit<AIInsight, "id" | "date">) => {
     const newNotif: AIInsight = {
       ...notification,
       id: `notif-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
@@ -506,7 +511,7 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
       unread: true,
     };
     setNotifications((prev) => [newNotif, ...prev]);
-  };
+  }, []);
 
   const resetState = () => {
     setStudentProfile(INITIAL_STUDENT_PROFILE);
