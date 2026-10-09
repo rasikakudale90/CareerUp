@@ -24,6 +24,9 @@ export default function SkillGapPage() {
     filterType === "All" ? skillGaps : skillGaps.filter((g) => g.category === filterType);
 
   const totalGapHours = skillGaps.reduce((acc, g) => acc + g.estimatedHours, 0);
+  const criticalGaps = skillGaps.filter((g) => g.category === "Critical");
+  const criticalGapsNames = criticalGaps.map((g) => g.name).slice(0, 2).join(" & ") || "No Critical Gaps";
+  const estimatedWeeks = Math.max(1, Math.ceil(totalGapHours / 10));
 
   return (
     <AppShell
@@ -43,14 +46,14 @@ export default function SkillGapPage() {
 
           <SpotlightCard className="p-5">
             <span className="text-[10px] text-[var(--text-muted)] uppercase font-bold tracking-wider">Critical Blockers</span>
-            <div className="text-xl font-bold text-red-500 mt-1">2 Skills</div>
-            <div className="text-[11px] text-[var(--text-secondary)]">Vector DBs &amp; Agentic Graphs</div>
+            <div className="text-xl font-bold text-red-500 mt-1">{criticalGaps.length} {criticalGaps.length === 1 ? "Skill" : "Skills"}</div>
+            <div className="text-[11px] text-[var(--text-secondary)] truncate">{criticalGapsNames}</div>
           </SpotlightCard>
 
           <SpotlightCard className="p-5">
             <span className="text-[10px] text-[var(--text-muted)] uppercase font-bold tracking-wider">Est. Time to Close</span>
             <div className="text-xl font-bold text-[var(--accent)] mt-1">{totalGapHours} Hours</div>
-            <div className="text-[11px] text-[var(--text-secondary)]">~4 to 6 weeks at 10h/week</div>
+            <div className="text-[11px] text-[var(--text-secondary)]">~{estimatedWeeks} {estimatedWeeks === 1 ? "week" : "weeks"} at 10h/week</div>
           </SpotlightCard>
 
           <div className="rounded-3xl bg-gradient-to-br from-[var(--bg-card-subtle)] to-[var(--bg-card)] border border-[var(--accent)]/30 p-5 flex flex-col justify-between card-hover-effect">

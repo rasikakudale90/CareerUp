@@ -124,6 +124,7 @@ export default function JobMatchPage() {
     toggleSimulatedSkill,
     isSimulatedSkillActive,
     roadmap,
+    studentProfile,
   } = usePrototype();
 
   const [activeTab, setActiveTab] = useState<"browse" | "custom">("browse");
@@ -205,6 +206,42 @@ export default function JobMatchPage() {
 
     setIsParsing(true);
     setTimeout(() => {
+      const KNOWN_TECH_KEYWORDS = [
+        "TypeScript", "JavaScript", "React", "Next.js", "Python", "FastAPI", "Node.js",
+        "Tailwind CSS", "GraphQL", "REST APIs", "WebSockets", "Docker", "Kubernetes",
+        "PostgreSQL", "MongoDB", "Redis", "Vector DB", "Vector Search", "Qdrant", "Pinecone",
+        "LangChain", "LangGraph", "LlamaIndex", "AI SDK", "PyTorch", "TensorFlow",
+        "LLM APIs", "Gemini", "OpenAI", "Prompt Engineering", "Fine-Tuning", "RAG Systems",
+        "Streaming UI", "CI/CD", "System Design", "Microservices", "AWS", "Agentic Tooling"
+      ];
+
+      const jdText = `${customRoleTitle} ${customJD}`.toLowerCase();
+      const detectedSkills = KNOWN_TECH_KEYWORDS.filter((tech) =>
+        jdText.includes(tech.toLowerCase())
+      );
+
+      const requiredSkills = detectedSkills.length > 0 
+        ? detectedSkills 
+        : ["TypeScript", "React", "FastAPI", "LLM APIs", "System Architecture"];
+
+      const candidateSkills = (studentProfile?.skills || []).map((s) =>
+        (typeof s === "string" ? s : s.name).toLowerCase()
+      );
+
+      const matchedSkills = requiredSkills.filter((sk) =>
+        candidateSkills.some((cs) => cs.includes(sk.toLowerCase()) || sk.toLowerCase().includes(cs))
+      );
+
+      const missingSkills = requiredSkills.filter((sk) => !matchedSkills.includes(sk));
+
+      const matchPct = Math.min(
+        98,
+        Math.max(
+          55,
+          Math.round((matchedSkills.length / Math.max(1, requiredSkills.length)) * 100)
+        )
+      );
+
       addCustomJobMatch({
         id: `custom-job-${Date.now()}`,
         company: customCompany || "Target Tech Co.",
@@ -213,12 +250,12 @@ export default function JobMatchPage() {
         title: customRoleTitle,
         location: "Remote / Hybrid",
         workType: "Remote",
-        salaryRange: "$150,000 – $180,000",
-        matchPercentage: 87,
+        salaryRange: "$150,000 – $190,000",
+        matchPercentage: matchPct,
         postedDate: "Parsed Just Now",
-        requiredSkills: ["Next.js", "TypeScript", "FastAPI", "Vector Search", "LangGraph"],
-        matchedSkills: ["Next.js", "TypeScript", "FastAPI"],
-        missingSkills: ["Vector Search", "LangGraph"],
+        requiredSkills,
+        matchedSkills,
+        missingSkills,
         description: customJD,
       });
       setIsParsing(false);
@@ -226,7 +263,7 @@ export default function JobMatchPage() {
       setCustomRoleTitle("");
       setCustomCompany("");
       setCustomJD("");
-    }, 900);
+    }, 700);
   };
 
   const activeBridgeDetails = activeModalSkill ? getSkillBridgeDetails(activeModalSkill.skill) : null;

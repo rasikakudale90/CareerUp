@@ -26,6 +26,7 @@ export default function DashboardPage() {
     careerPaths,
     selectedCareerId,
     setSelectedCareerId,
+    selectedCareer,
     skillGaps,
     roadmap,
     jobMatches,
@@ -38,6 +39,8 @@ export default function DashboardPage() {
 
   const topMatches = careerPaths.slice(0, 3);
   const criticalGaps = skillGaps.filter((g) => g.category === "Critical");
+  const topMissingSkill = criticalGaps[0]?.name || selectedCareer.keyMissingSkills?.[0] || "Agentic Workflows";
+  const potentialLift = Math.min(18, Math.max(8, 99 - selectedCareer.matchScore));
 
   return (
     <AppShell
@@ -205,18 +208,18 @@ export default function DashboardPage() {
                 </div>
 
                 <h3 className="text-base font-bold text-[var(--text-primary)] mb-2 leading-snug">
-                  What if you learn LangGraph &amp; Agentic Workflows?
+                  What if you acquire {topMissingSkill}?
                 </h3>
 
                 <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-4">
-                  Simulate how acquiring high-impact AI skills shifts your career match from 92% to 98% and unlocks 1,400+ premium positions.
+                  Simulate how acquiring {topMissingSkill} elevates your {selectedCareer.title} fit to 98% and unlocks {selectedCareer.openRolesCount.toLocaleString()}+ positions.
                 </p>
               </div>
 
               <div className="space-y-3">
                 <div className="p-3 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)] flex items-center justify-between text-xs">
                   <span className="text-[var(--text-secondary)]">Projected Match Lift:</span>
-                  <span className="font-bold text-emerald-500 shimmer-text">+14% to AI Roles</span>
+                  <span className="font-bold text-emerald-500 shimmer-text">+{potentialLift}% to {selectedCareer.title.split(" ")[0]}</span>
                 </div>
 
                 <Link
@@ -276,8 +279,8 @@ export default function DashboardPage() {
               <div className="mt-4 pt-3 border-t border-[var(--border-color)]">
                 <div className="text-[11px] text-[var(--text-secondary)] mb-1">Top Priority Gap to Close:</div>
                 <div className="text-xs font-semibold text-[var(--text-primary)] flex items-center justify-between">
-                  <span>Vector Databases &amp; Hybrid RAG</span>
-                  <span className="text-[10px] text-[var(--accent)] font-bold">~20 hrs</span>
+                  <span className="truncate pr-2">{criticalGaps[0]?.name || "Core Infrastructure"}</span>
+                  <span className="text-[10px] text-[var(--accent)] font-bold shrink-0">~{criticalGaps[0]?.estimatedHours || 15} hrs</span>
                 </div>
               </div>
             </SpotlightCard>

@@ -26,6 +26,7 @@ export default function RoadmapPage() {
     overallReadinessScore,
     completedTasksCount,
     totalTasksCount,
+    selectedCareer,
   } = usePrototype();
 
   const [activePhaseFilter, setActivePhaseFilter] = useState<number | "all">("all");
@@ -58,7 +59,7 @@ export default function RoadmapPage() {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-soft)] border border-[var(--accent)]/40 text-xs text-[var(--accent)] font-bold mb-2 shimmer-badge">
                 <Sparkles className="h-3 w-3" />
-                <span>Active Target: AI Product Engineer</span>
+                <span>Active Target: {selectedCareer?.title || "AI Product Engineer"}</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">
                 Roadmap Progress: {completedTasksCount} of {totalTasksCount} Tasks Completed ({progressPercent}%)

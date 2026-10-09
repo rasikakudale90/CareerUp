@@ -19,14 +19,14 @@ import { SpotlightCard } from "@/components/motion/SpotlightCard";
 import { usePrototype } from "@/lib/prototype-state";
 
 export default function ReadinessPage() {
-  const { studentProfile, overallReadinessScore, completedTasksCount, totalTasksCount } = usePrototype();
+  const { studentProfile, overallReadinessScore, completedTasksCount, totalTasksCount, selectedCareer } = usePrototype();
 
   const readinessBreakdown = [
-    { label: "Technical Execution Depth", score: 86, desc: "Strong frontend architecture, React 19, FastAPI integration." },
+    { label: "Technical Execution Depth", score: Math.min(98, Math.max(60, Math.round(overallReadinessScore * 0.96))), desc: "Strong frontend architecture, React 19, FastAPI integration." },
     { label: "AI & Model Tooling", score: overallReadinessScore, desc: "Gemini Live API streaming, RAG foundations, prompt caching." },
-    { label: "System Design & Scalability", score: 72, desc: "Redis caching, rate limiting, and containerized Docker services." },
-    { label: "Portfolio Evidence & Open Source", score: 88, desc: "3 live deployed repositories with active campus users." },
-    { label: "Technical Interview Defense", score: 78, desc: "Articulates trade-offs between latency, accuracy, and token costs." },
+    { label: "System Design & Scalability", score: Math.min(95, Math.max(50, Math.round(overallReadinessScore * 0.84))), desc: "Redis caching, rate limiting, and containerized Docker services." },
+    { label: "Portfolio Evidence & Open Source", score: Math.min(99, Math.max(65, Math.round(overallReadinessScore * 0.98))), desc: `${studentProfile.projects.length} verified project repositories with active live deployments.` },
+    { label: "Technical Interview Defense", score: Math.min(96, Math.max(55, Math.round(overallReadinessScore * 0.89))), desc: "Articulates trade-offs between latency, accuracy, and token costs." },
   ];
 
   return (
@@ -55,11 +55,11 @@ export default function ReadinessPage() {
               </div>
 
               <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
-                Profile Status: Strongly Positioned for AI Product Engineering Roles
+                Profile Status: Strongly Positioned for {selectedCareer?.title || "AI Product Engineering"} Roles
               </h2>
 
               <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                Your portfolio projects demonstrate exceptional craft in streaming AI user experiences. Completing your remaining {totalTasksCount - completedTasksCount} roadmap tasks will firmly place you in the top 5th percentile of new grad and junior applicants.
+                Your portfolio projects demonstrate exceptional craft in streaming AI user experiences. Completing your remaining {Math.max(0, totalTasksCount - completedTasksCount)} roadmap tasks will firmly place you in the top 5th percentile of new grad and junior applicants.
               </p>
 
               <div className="flex flex-wrap gap-3 pt-2">

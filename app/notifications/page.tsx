@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Bell,
@@ -34,6 +34,11 @@ export default function NotificationsPage() {
   } = usePrototype();
 
   const [activeTab, setActiveTab] = useState<string>("All");
+
+  // Automatically mark all notifications as read when viewing the notifications page so the counter badge disappears immediately
+  useEffect(() => {
+    markAllNotificationsRead();
+  }, [markAllNotificationsRead]);
 
   const categories = ["All", "Unread", "Match Alert", "Skill Milestone", "Market Shift", "Readiness Boost", "System Update"];
 
@@ -81,6 +86,13 @@ export default function NotificationsPage() {
         actionText: "View Readiness",
         actionHref: "/readiness",
       },
+      {
+        category: "Skill Milestone" as const,
+        title: "New Vector DB benchmark module ready",
+        message: "Complete the hybrid search indexing task in your roadmap to close your top critical blocker.",
+        actionText: "Open Roadmap",
+        actionHref: "/roadmap",
+      },
     ];
 
     const random = alerts[Math.floor(Math.random() * alerts.length)];
@@ -111,24 +123,22 @@ export default function NotificationsPage() {
               </p>
             </div>
 
-            <div className="flex items-center gap-3 shrink-0">
+            <div className="flex items-center gap-3 shrink-0 flex-wrap">
               <button
                 onClick={handleSimulateNewAlert}
                 className="px-4 py-2.5 rounded-2xl bg-[var(--bg-card-subtle)] hover:bg-[var(--border-color)] border border-[var(--border-color)] text-xs font-semibold text-[var(--text-primary)] transition-all flex items-center gap-2 shadow-sm hover:scale-105 active:scale-95"
               >
                 <Bot className="h-4 w-4 text-[var(--accent)]" />
-                <span>Trigger AI Alert</span>
+                <span>Trigger New Alert</span>
               </button>
 
-              {unreadNotificationsCount > 0 && (
-                <button
-                  onClick={markAllNotificationsRead}
-                  className="px-4 py-2.5 rounded-2xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold transition-all flex items-center gap-2 shadow-md hover:scale-105 active:scale-95"
-                >
-                  <CheckCheck className="h-4 w-4" />
-                  <span>Mark All Read</span>
-                </button>
-              )}
+              <button
+                onClick={markAllNotificationsRead}
+                className="px-4 py-2.5 rounded-2xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold transition-all flex items-center gap-2 shadow-md hover:scale-105 active:scale-95"
+              >
+                <CheckCheck className="h-4 w-4" />
+                <span>Mark All Read</span>
+              </button>
             </div>
           </div>
         </div>
@@ -202,7 +212,7 @@ export default function NotificationsPage() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent)] text-white text-xs font-semibold hover:bg-[var(--accent-hover)] transition-all shadow-md"
               >
                 <Zap className="h-3.5 w-3.5" />
-                <span>Simulate Market Notification</span>
+                <span>Trigger Live AI Alert</span>
               </button>
             </SpotlightCard>
           ) : (
@@ -210,7 +220,7 @@ export default function NotificationsPage() {
               <SpotlightCard
                 key={notif.id}
                 onClick={() => markNotificationRead(notif.id)}
-                className={`p-5 rounded-3xl border transition-all card-hover-effect ${
+                className={`p-5 rounded-3xl border transition-all card-hover-effect cursor-pointer ${
                   notif.unread
                     ? "bg-[var(--accent-soft)]/20 border-[var(--accent)]/60 shadow-xl ring-1 ring-[var(--accent)]/20"
                     : "bg-[var(--bg-card)] border-[var(--border-color)] hover:border-[var(--accent)]/40"
@@ -254,6 +264,10 @@ export default function NotificationsPage() {
                     {notif.actionHref && (
                       <Link
                         href={notif.actionHref}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          markNotificationRead(notif.id);
+                        }}
                         className="px-4 py-2 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold transition-all flex items-center gap-1.5 shadow-md hover:scale-105 active:scale-95"
                       >
                         <span>{notif.actionText || "View Details"}</span>
