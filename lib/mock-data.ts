@@ -117,11 +117,12 @@ export interface JobListing {
 export interface AIInsight {
   id: string;
   date: string;
-  category: "Match Alert" | "Skill Milestone" | "Market Shift" | "Readiness Boost";
+  category: "Match Alert" | "Skill Milestone" | "Market Shift" | "Readiness Boost" | "System Update";
   title: string;
   message: string;
   actionText: string;
   actionHref: string;
+  unread?: boolean;
 }
 
 export const INITIAL_STUDENT_PROFILE: StudentProfile = {

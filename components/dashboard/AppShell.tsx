@@ -17,6 +17,8 @@ import {
   ChevronRight,
   RotateCcw,
   Users,
+  LogOut,
+  Upload,
 } from "lucide-react";
 import { usePrototype } from "@/lib/prototype-state";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -30,7 +32,17 @@ interface AppShellProps {
 export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { studentProfile, overallReadinessScore, resetState, signIn, greeting } = usePrototype();
+  const {
+    studentProfile,
+    overallReadinessScore,
+    resetState,
+    signIn,
+    signOut,
+    isAuthenticated,
+    unreadNotificationsCount,
+    greeting,
+  } = usePrototype();
+
   const [searchQuery, setSearchQuery] = useState("");
 
   const isAlex = studentProfile.id === "student-alex";
@@ -43,6 +55,7 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
     { label: "What If Simulator", href: "/what-if", icon: Sparkles },
     { label: "Job Match", href: "/job-match", icon: Briefcase },
     { label: "Job Readiness", href: "/readiness", icon: ShieldCheck },
+    { label: "Notifications", href: "/notifications", icon: Bell, badge: unreadNotificationsCount },
     { label: "Profile", href: "/profile", icon: User },
   ];
 
@@ -56,6 +69,7 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
     else if (q.includes("job") || q.includes("match") || q.includes("apply")) router.push("/job-match");
     else if (q.includes("career") || q.includes("role") || q.includes("path")) router.push("/career");
     else if (q.includes("ready") || q.includes("score")) router.push("/readiness");
+    else if (q.includes("notif") || q.includes("alert")) router.push("/notifications");
     else router.push("/career");
   };
 
@@ -65,6 +79,11 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
     } else {
       signIn("alex.morgan@stanford.edu", "", "alex");
     }
+  };
+
+  const handleSignOut = () => {
+    signOut();
+    router.push("/");
   };
 
   return (
@@ -137,7 +156,12 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
                     }`}
                   />
                   <span className="transition-colors">{item.label}</span>
-                  {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-ping" />}
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <span className="ml-auto px-1.5 py-0.5 rounded-full bg-[var(--accent)] text-white text-[10px] font-bold">
+                      {item.badge}
+                    </span>
+                  )}
+                  {isActive && !item.badge && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-ping" />}
                 </Link>
               );
             })}
@@ -182,9 +206,14 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
               <RotateCcw className="h-3 w-3" />
               <span>Reset State</span>
             </button>
-            <Link href="/" className="hover:text-[var(--text-primary)] transition-colors">
-              Exit App
-            </Link>
+            <button
+              onClick={handleSignOut}
+              className="flex items-center gap-1 text-red-500 hover:text-red-400 font-semibold transition-colors"
+              title="Sign Out of Session"
+            >
+              <LogOut className="h-3 w-3" />
+              <span>Log Out</span>
+            </button>
           </div>
         </div>
       </aside>
@@ -236,21 +265,26 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Ask anything about careers..."
-                className="w-44 lg:w-56 pl-9 pr-3 py-1.5 rounded-full bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)] transition-all hover:border-[var(--accent)]/50"
+                className="w-40 lg:w-52 pl-9 pr-3 py-1.5 rounded-full bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-xs text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)] transition-all hover:border-[var(--accent)]/50"
               />
             </form>
 
-            {/* Notification Bell */}
+            {/* Notification Bell (Correctly routing to /notifications) */}
             <Link
-              href="/dashboard"
+              href="/notifications"
               className="p-2 rounded-full bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all hover:scale-110 active:scale-95 relative"
+              title="Career Intelligence Notifications"
             >
               <Bell className="h-4 w-4" />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
+              {unreadNotificationsCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-[var(--accent)] text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
+                  {unreadNotificationsCount}
+                </span>
+              )}
             </Link>
 
             {/* User Avatar */}
-            <Link href="/profile" className="hover:scale-110 active:scale-95 transition-transform">
+            <Link href="/profile" className="hover:scale-110 active:scale-95 transition-transform" title="My Profile">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={studentProfile.avatarUrl}
@@ -258,6 +292,17 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
                 className="w-8 h-8 rounded-full object-cover border-2 border-[var(--accent)] shadow-md"
               />
             </Link>
+
+            {/* Quick Log Out Button in Top Header */}
+            {isAuthenticated && (
+              <button
+                onClick={handleSignOut}
+                title="Log Out"
+                className="p-2 rounded-full hover:bg-red-500/15 text-[var(--text-secondary)] hover:text-red-500 border border-transparent hover:border-red-500/20 transition-all"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
+            )}
           </div>
         </header>
 
@@ -278,6 +323,11 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
               >
                 <Icon className="h-3.5 w-3.5" />
                 <span>{item.label}</span>
+                {item.badge !== undefined && item.badge > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full bg-[var(--accent)] text-white text-[9px] font-bold">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             );
           })}

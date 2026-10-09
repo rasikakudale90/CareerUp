@@ -1,17 +1,23 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/navigation";
 import NextLink from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Sparkles, ArrowRight, Menu, X, RotateCcw, LogIn, LogOut, User } from "lucide-react";
+import { Sparkles, ArrowRight, Menu, X, RotateCcw, LogIn, LogOut, User, Bell } from "lucide-react";
 import { usePrototype } from "@/lib/prototype-state";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { overallReadinessScore, resetState, isAuthenticated, currentUser, signOut } = usePrototype();
+  const {
+    overallReadinessScore,
+    resetState,
+    isAuthenticated,
+    currentUser,
+    signOut,
+    unreadNotificationsCount,
+  } = usePrototype();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -27,6 +33,7 @@ export function Navbar() {
 
   const handleSignOut = () => {
     signOut();
+    setMobileMenuOpen(false);
     router.push("/");
   };
 
@@ -96,12 +103,27 @@ export function Navbar() {
               <RotateCcw className="h-4 w-4" />
             </button>
 
+            {/* Notifications Icon (Desktop) */}
+            {isAuthenticated && (
+              <NextLink
+                href="/notifications"
+                className="p-2 rounded-full hover:bg-[var(--bg-card-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all relative"
+                title="Notifications"
+              >
+                <Bell className="h-4 w-4" />
+                {unreadNotificationsCount > 0 && (
+                  <span className="absolute 1 top-1 right-1 w-2 h-2 rounded-full bg-[var(--accent)] animate-pulse" />
+                )}
+              </NextLink>
+            )}
+
             {/* Auth Buttons / User Avatar */}
             {isAuthenticated && currentUser ? (
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <NextLink
                   href="/profile"
-                  className="flex items-center gap-2 p-1 pl-2.5 rounded-full bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] transition-all text-xs text-[var(--text-primary)]"
+                  className="flex items-center gap-2 p-1 pl-2.5 rounded-full bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-[var(--accent)] transition-all text-xs text-[var(--text-primary)]"
+                  title="My Profile"
                 >
                   <span className="hidden sm:inline font-medium">{currentUser.name.split(" ")[0]}</span>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -156,7 +178,7 @@ export function Navbar() {
           </div>
         </nav>
 
-        {/* Mobile Dropdown */}
+        {/* Mobile Dropdown Hamburger Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden mt-2 p-4 rounded-3xl bg-[var(--bg-nav)] border border-[var(--border-color)] backdrop-blur-2xl text-[var(--text-primary)] shadow-2xl flex flex-col gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
             {navLinks.map((link) => (
@@ -174,11 +196,39 @@ export function Navbar() {
               </NextLink>
             ))}
 
+            {isAuthenticated && (
+              <>
+                <NextLink
+                  href="/notifications"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-4 py-2.5 rounded-2xl text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-card-subtle)] flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <Bell className="h-4 w-4" />
+                    <span>Notifications</span>
+                  </div>
+                  {unreadNotificationsCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-[var(--accent)] text-white text-xs font-bold">
+                      {unreadNotificationsCount}
+                    </span>
+                  )}
+                </NextLink>
+                <NextLink
+                  href="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-4 py-2.5 rounded-2xl text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-card-subtle)] flex items-center gap-2"
+                >
+                  <User className="h-4 w-4" />
+                  <span>My Profile &amp; Career DNA</span>
+                </NextLink>
+              </>
+            )}
+
             <div className="pt-2 border-t border-[var(--border-color)] flex items-center justify-between">
               {isAuthenticated ? (
                 <button
                   onClick={handleSignOut}
-                  className="w-full py-2.5 rounded-2xl bg-red-500/15 text-red-500 text-xs font-semibold flex items-center justify-center gap-2"
+                  className="w-full py-2.5 rounded-2xl bg-red-500/15 hover:bg-red-500/25 text-red-500 text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
                   <span>Sign Out</span>

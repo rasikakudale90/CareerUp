@@ -157,6 +157,15 @@ async function runComprehensiveSuite() {
         "PulseAI",
       ],
     },
+    {
+      path: "/notifications",
+      name: "AI Career Notifications",
+      markers: [
+        "AI Career Intelligence Notifications",
+        "Notifications",
+        "Live Career Intelligence Feed",
+      ],
+    },
   ];
 
   for (const r of routes) {
