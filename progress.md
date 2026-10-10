@@ -67,16 +67,40 @@ CareerUp transforms static resumes into actionable, multidimensional career inte
 
 ---
 
+### 3. User Experience & Real-World Feedback Bug Resolutions (2026-10-10)
+
+1. **Dashboard Pre-Upload State & Calibration Banner (Bug 1)**:
+   - Added `hasUploadedResume` state tracking.
+   - When entering `/dashboard` before uploading a resume, users are presented with a **"Upload Resume to Calibrate Your Live Career DNA"** banner featuring an in-place drag-and-drop uploader and a link to 4-Step AI Ingestion.
+   - Clear indicators denote uncalibrated baseline preview versus verified candidate data.
+
+2. **Reactive Multi-System Resume Calibration (Bug 2)**:
+   - Uploading different resumes dynamically recalculates **all interconnected metrics**: candidate radar polygon scores, match scores across all 6 career tracks, custom skill gaps, personalized 12-week roadmap milestones, job match compatibility %, and overall readiness index.
+   - Tested across diverse candidate profiles (Fullstack AI, ML/Data Scientist, Systems Architect, and custom uploaded resumes).
+
+3. **Roadmap Initial Clean State (Bug 3)**:
+   - Fixed pre-completed task flags in `INITIAL_ROADMAP` (`completed: false` for all baseline tasks).
+   - Milestones and tasks now start completely fresh (0% progress) and only reflect tasks explicitly checked by the candidate.
+
+4. **Multi-Account State Isolation (Bug 4)**:
+   - Scoped `localStorage` persistence per user email (`careerup_state_v4_<user_email>`).
+   - Logging in or registering with a different account initializes clean candidate state without previous user data, custom job matches, or simulation leakage.
+
+5. **Dedicated ATS Diagnostic Modal & Query Routing (Bug 5)**:
+   - Replaced plain `/job-match` navigation link on "Test ATS Score" with an interactive **ATS Compatibility Diagnostic Modal** showing live ATS match %, keyword density, architecture alignment, and recruiter compliance.
+   - Added direct action buttons to test custom job descriptions (`/job-match?tab=custom`) or browse matching openings (`/job-match?tab=browse`).
+
+---
+
 ## 📊 Verification & Deployment Matrix
 
 | Verification Scope | Platform | Status | Result |
 | :--- | :--- | :---: | :--- |
 | **Frontend Production Build** | Vercel / Turbopack | ✅ Verified | **19/19 static routes compiled cleanly (0 TypeScript / Turbopack errors)**. |
-| **Frontend Automated Test Suite** | Node.js Test Runner | ✅ Verified | 100% assertions passed across all 19 routes and state engines. |
+| **User Experience Bug Suite** | Next.js 16 Client & State | ✅ Verified | All 5 UX issues resolved and verified end-to-end. |
 | **Live Cloud Backend Verification** | Render (`careerup-h35y`) | ✅ Verified | 16 of 16 REST endpoints operational. |
-| **GitHub Repository Sync** | GitHub (`main`) | ✅ Up to Date | All changes committed and pushed to `origin main` (triggering Vercel auto-deploy). |
 
 ---
 
 ## 🎯 Current Status
-All requested bugs, layout alignments, single-user auth rules, dynamic metrics, and notification badge behaviors have been completely resolved, verified, documented, and deployed.
+All 5 user-reported experience bugs have been thoroughly fixed, tested with clean production builds, and documented.

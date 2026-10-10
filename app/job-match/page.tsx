@@ -21,6 +21,7 @@ import {
   Copy,
   CheckCheck,
 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { SpotlightCard } from "@/components/motion/SpotlightCard";
 import { usePrototype } from "@/lib/prototype-state";
@@ -115,7 +116,10 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]`,
   };
 }
 
-export default function JobMatchPage() {
+function JobMatchContent() {
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") === "custom" ? "custom" : "browse";
+
   const {
     jobMatches,
     applyToJob,
@@ -127,7 +131,16 @@ export default function JobMatchPage() {
     studentProfile,
   } = usePrototype();
 
-  const [activeTab, setActiveTab] = useState<"browse" | "custom">("browse");
+  const [activeTab, setActiveTab] = useState<"browse" | "custom">(initialTab);
+
+  React.useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam === "custom") {
+      setActiveTab("custom");
+    } else if (tabParam === "browse") {
+      setActiveTab("browse");
+    }
+  }, [searchParams]);
   const [customRoleTitle, setCustomRoleTitle] = useState("");
   const [customCompany, setCustomCompany] = useState("");
   const [customJD, setCustomJD] = useState("");
@@ -659,5 +672,13 @@ export default function JobMatchPage() {
         )}
       </div>
     </AppShell>
+  );
+}
+
+export default function JobMatchPage() {
+  return (
+    <React.Suspense fallback={<div className="min-h-screen bg-[var(--bg-primary)] p-8 text-center text-xs text-[var(--text-muted)] flex items-center justify-center">Loading ATS Job Match Engine...</div>}>
+      <JobMatchContent />
+    </React.Suspense>
   );
 }

@@ -18,6 +18,11 @@ import {
   Trash2,
   CheckCircle2,
   ExternalLink,
+  ShieldCheck,
+  X,
+  FileCheck,
+  Search,
+  Briefcase,
 } from "lucide-react";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { SpotlightCard } from "@/components/motion/SpotlightCard";
@@ -42,6 +47,8 @@ export default function WhatIfPage() {
   const [customSkillInput, setCustomSkillInput] = useState("");
   const [customCategoryInput, setCustomCategoryInput] = useState("AI Architecture");
   const [commitSuccess, setCommitSuccess] = useState<{ count: number } | null>(null);
+  const [isATSModalOpen, setIsATSModalOpen] = useState(false);
+  const [isScanningATS, setIsScanningATS] = useState(false);
 
   const activePredefinedCount = simulatedSkills.filter((s) => s.added && !s.id.startsWith("custom-sim-")).length;
   const activeCustomCount = customSimulatedSkills.filter((s) => isSimulatedSkillActive(s.id)).length;
@@ -73,100 +80,94 @@ export default function WhatIfPage() {
     }
   };
 
-  const calculateSimulatedScore = (baseScore: number) => {
-    return Math.min(99, baseScore + totalLift);
+  const handleOpenATSDiagnostic = () => {
+    setIsScanningATS(true);
+    setIsATSModalOpen(true);
+    setTimeout(() => {
+      setIsScanningATS(false);
+    }, 750);
   };
+
+  const calculateSimulatedScore = (baseScore: number) => {
+    return Math.min(99, Math.max(baseScore, baseScore + totalLift));
+  };
+
+  const activeSimulatedSkillNames = simulatedSkills.filter((s) => s.added).map((s) => s.name);
+
+  // ATS Calculations based on baseline + simulated skills
+  const baselineATS = Math.min(88, Math.max(62, 60 + studentProfile.skills.length * 2));
+  const simulatedATS = Math.min(98, baselineATS + totalActiveCount * 4);
 
   return (
     <AppShell
-      headerTitle="What-If Skill & Career Simulator"
-      headerSubtitle="Experiment with potential skill acquisitions in real-time to preview match score surges and commit them directly to your learning roadmap."
+      headerTitle="Career What-If Simulator"
+      headerSubtitle="Explore how acquiring high-leverage frameworks and distributed systems skills dynamically alters your career trajectory."
     >
       <div className="space-y-6">
-        {/* Commit Success Notification Banner */}
+        {/* Success Banner when Committing Skills */}
         {commitSuccess && (
-          <div className="p-4 rounded-3xl bg-emerald-500/15 border-2 border-emerald-500/40 text-[var(--text-primary)] shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-lg">
-                <CheckCircle2 className="h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                  {commitSuccess.count} Simulated Skills Permanently Added to Your Profile &amp; Roadmap!
-                </h4>
-                <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-                  Your skill matrix and 12-week roadmap milestones have been updated dynamically.
-                </p>
-              </div>
-            </div>
+          <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-semibold text-xs flex items-center justify-between shadow-xl animate-in slide-in-from-top-2 duration-300">
             <div className="flex items-center gap-2">
-              <Link
-                href="/roadmap"
-                className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-all shadow-md"
-              >
-                View in 12-Week Roadmap
-              </Link>
-              <Link
-                href="/profile"
-                className="px-4 py-2 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] text-xs font-semibold text-[var(--text-primary)]"
-              >
-                Inspect DNA
-              </Link>
+              <CheckCircle2 className="h-4 w-4 shrink-0" />
+              <span>
+                Committed {commitSuccess.count} simulated skill{commitSuccess.count > 1 ? "s" : ""} to your verified profile and 12-week roadmap!
+              </span>
             </div>
+            <Link href="/roadmap" className="underline hover:text-white text-[11px]">
+              View Updated Roadmap →
+            </Link>
           </div>
         )}
 
-        {/* Simulator Control Header */}
-        <div className="rounded-3xl bg-gradient-to-br from-[var(--bg-card-subtle)] via-[var(--bg-card)] to-[var(--bg-primary)] border border-[var(--accent)]/40 p-6 sm:p-8 shadow-2xl relative overflow-hidden card-hover-effect">
-          <div className="absolute top-0 right-0 w-72 h-72 bg-[var(--accent-soft)] rounded-full blur-3xl pointer-events-none" />
-
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[var(--accent-soft)] border border-[var(--accent)]/40 text-xs text-[var(--accent)] font-bold mb-3 shimmer-badge">
-                <Zap className="h-3.5 w-3.5 animate-pulse" />
-                <span>Simulation Sandbox Mode</span>
+        {/* Dynamic Simulation Live Stats Bar */}
+        <div className="p-6 rounded-3xl bg-gradient-to-r from-[var(--bg-card-subtle)] via-[var(--bg-card)] to-[var(--bg-primary)] border border-[var(--accent)]/30 shadow-2xl relative overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-soft)] border border-[var(--accent)]/40 text-xs text-[var(--accent)] font-bold mb-1 shimmer-badge">
+                <Zap className="h-3 w-3" />
+                <span>Multi-Dimensional Sandbox</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] tracking-tight">
-                Simulate Your Next High-Impact Move
+              <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">
+                Active Simulations: {totalActiveCount} Framework{totalActiveCount === 1 ? "" : "s"} Selected
               </h2>
-              <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-xl mt-1 leading-relaxed">
-                Toggle industry skills below or type any custom technology. All custom simulations persist automatically across page reloads.
+              <p className="text-xs text-[var(--text-secondary)]">
+                Select industry benchmark skills or input custom technologies below to instantly recalculate your fit scores.
               </p>
             </div>
 
-            <div className="flex items-center gap-4 bg-[var(--bg-card-subtle)] p-4 rounded-2xl border border-[var(--border-color)] shrink-0 shadow-xl">
+            <div className="flex items-center gap-4 self-start md:self-auto bg-[var(--bg-card-subtle)] px-5 py-3.5 rounded-2xl border border-[var(--border-color)]">
               <div className="text-center">
-                <span className="text-[10px] text-[var(--text-muted)] uppercase font-bold block">Active Simulations</span>
-                <span className="text-2xl font-bold text-[var(--accent)]">{totalActiveCount} Skills</span>
+                <span className="text-[10px] text-[var(--text-muted)] uppercase font-bold block">Live Readiness</span>
+                <span className="text-2xl font-bold text-[var(--accent)] shimmer-text">{overallReadinessScore}%</span>
               </div>
               <div className="h-8 w-px bg-[var(--border-color)]" />
               <div className="text-center">
-                <span className="text-[10px] text-[var(--text-muted)] uppercase font-bold block">Simulated Readiness</span>
-                <span className="text-2xl font-bold text-emerald-500 shimmer-text">{overallReadinessScore}%</span>
+                <span className="text-[10px] text-[var(--text-muted)] uppercase font-bold block">Match Lift</span>
+                <span className="text-2xl font-bold text-emerald-500">+{totalLift}%</span>
+              </div>
+              <div className="h-8 w-px bg-[var(--border-color)]" />
+              <div className="text-center">
+                <span className="text-[10px] text-[var(--text-muted)] uppercase font-bold block">Est. Comp Lift</span>
+                <span className="text-xl font-bold text-[var(--text-primary)]">{projectedSalaryLift}</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* AI Strategic Impact Dashboard Banner */}
+        {/* Active Simulation Actions Banner */}
         {totalActiveCount > 0 && (
-          <SpotlightCard className="rounded-3xl bg-gradient-to-r from-[var(--accent-soft)] via-[var(--bg-card)] to-emerald-500/10 border-2 border-[var(--accent)]/40 p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
+          <SpotlightCard className="p-6 rounded-3xl bg-[var(--bg-card)] border-2 border-[var(--accent)] shadow-2xl space-y-4 animate-in fade-in duration-300">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-start gap-3.5">
-                <div className="w-10 h-10 rounded-2xl bg-[var(--accent)] text-white flex items-center justify-center shrink-0 shadow-lg">
-                  <Bot className="h-5 w-5" />
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[var(--accent)] text-white flex items-center justify-center shadow-lg shrink-0">
+                  <Sparkles className="h-5 w-5" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)]">
-                      AI Sandbox Projection Analysis
-                    </h3>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold uppercase">
-                      Active Surge
-                    </span>
-                  </div>
-                  <p className="text-xs text-[var(--text-secondary)] mt-1">
-                    Mastering these {totalActiveCount} simulated skills removes your top blockers for Tier-1 AI Product Engineer &amp; Fullstack AI roles at OpenAI, Linear, and Scale AI.
+                  <h3 className="text-sm font-bold text-[var(--text-primary)]">
+                    Simulating {totalActiveCount} Active Technologies: {activeSimulatedSkillNames.join(", ")}
+                  </h3>
+                  <p className="text-xs text-[var(--text-secondary)]">
+                    Your projected trajectory has been elevated across all matching tech stacks and ATS algorithms.
                   </p>
                 </div>
               </div>
@@ -196,13 +197,13 @@ export default function WhatIfPage() {
                   <Layers className="h-3.5 w-3.5" />
                   <span>Commit to My Roadmap &amp; Profile</span>
                 </button>
-                <Link
-                  href="/job-match"
-                  className="px-4 py-2.5 rounded-xl bg-[var(--bg-card-subtle)] hover:bg-[var(--border-color)] border border-[var(--border-color)] text-[var(--text-primary)] font-semibold transition-all flex items-center gap-1.5"
+                <button
+                  onClick={handleOpenATSDiagnostic}
+                  className="px-4 py-2.5 rounded-xl bg-[var(--bg-card-subtle)] hover:bg-[var(--border-color)] border border-[var(--accent)]/40 text-[var(--accent)] font-semibold transition-all flex items-center gap-1.5 shadow-md active:scale-95"
                 >
+                  <FileCheck className="h-3.5 w-3.5" />
                   <span>Test ATS Score</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
+                </button>
                 <button
                   onClick={resetSimulation}
                   className="p-2.5 rounded-xl bg-[var(--bg-card-subtle)] hover:bg-red-500/15 hover:text-red-500 border border-[var(--border-color)] text-[var(--text-secondary)] transition-all"
@@ -405,6 +406,113 @@ export default function WhatIfPage() {
           </div>
         </div>
       </div>
+
+      {/* DEDICATED ATS COMPATIBILITY DIAGNOSTIC MODAL (Addresses Bug 5) */}
+      {isATSModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-lg bg-[var(--bg-card)] border border-[var(--border-color)] rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setIsATSModalOpen(false)}
+              className="absolute top-5 right-5 p-2 rounded-full bg-[var(--bg-card-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white shadow-lg shrink-0">
+                <FileCheck className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-[var(--text-primary)]">
+                  Live ATS Compatibility Diagnostic
+                </h3>
+                <p className="text-xs text-[var(--text-secondary)]">
+                  Simulating recruiter filters (Workday, Greenhouse, Lever ATS parsers)
+                </p>
+              </div>
+            </div>
+
+            {isScanningATS ? (
+              <div className="py-12 text-center space-y-3">
+                <div className="w-10 h-10 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin mx-auto" />
+                <p className="text-xs text-[var(--text-secondary)]">Parsing keyword density and schema rubrics...</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Score Dial Display */}
+                <div className="p-5 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-[var(--text-muted)] block">
+                      Overall ATS Readiness Index
+                    </span>
+                    <div className="text-2xl font-bold text-emerald-400 flex items-center gap-2 mt-0.5">
+                      <span>{simulatedATS}% Match</span>
+                      {totalLift > 0 && (
+                        <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-semibold">
+                          +{totalActiveCount * 4}% Simulated Boost
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="text-right text-xs">
+                    <span className="text-[var(--text-muted)] block">Candidate Baseline:</span>
+                    <span className="font-semibold text-[var(--text-primary)]">{baselineATS}% ATS Fit</span>
+                  </div>
+                </div>
+
+                {/* ATS Parser Checklist Breakdown */}
+                <div className="space-y-2 text-xs">
+                  <div className="p-3 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)] flex items-center justify-between">
+                    <span className="text-[var(--text-secondary)] flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                      Core Technical Keyword Density
+                    </span>
+                    <span className="font-bold text-[var(--text-primary)]">96% (Optimal)</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)] flex items-center justify-between">
+                    <span className="text-[var(--text-secondary)] flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                      Architecture &amp; API Match Ratio
+                    </span>
+                    <span className="font-bold text-[var(--text-primary)]">{Math.min(99, 88 + totalActiveCount * 3)}% (High)</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)] flex items-center justify-between">
+                    <span className="text-[var(--text-secondary)] flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                      Schema &amp; Resume Formatting
+                    </span>
+                    <span className="font-bold text-emerald-400">100% (Compliant)</span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="space-y-2 pt-2">
+                  <Link
+                    href="/job-match?tab=custom"
+                    onClick={() => setIsATSModalOpen(false)}
+                    className="w-full py-3 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-lg hover:scale-[1.01]"
+                  >
+                    <Search className="h-3.5 w-3.5" />
+                    <span>Test Against Specific Job Description (Paste JD)</span>
+                  </Link>
+
+                  <Link
+                    href="/job-match?tab=browse"
+                    onClick={() => setIsATSModalOpen(false)}
+                    className="w-full py-3 rounded-xl bg-[var(--bg-card-subtle)] hover:bg-[var(--border-color)] border border-[var(--border-color)] text-[var(--text-primary)] text-xs font-semibold flex items-center justify-center gap-2 transition-all"
+                  >
+                    <Briefcase className="h-3.5 w-3.5" />
+                    <span>Browse Matching Tech Openings</span>
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }

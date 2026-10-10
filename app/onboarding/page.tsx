@@ -17,7 +17,7 @@ import { usePrototype } from "@/lib/prototype-state";
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { updateProfileFromResume } = usePrototype();
+  const { parseAndUploadResumeFile } = usePrototype();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [uploadedBlob, setUploadedBlob] = useState<File | null>(null);
@@ -25,10 +25,10 @@ export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(0);
 
   const steps = [
-    { title: "Extracting Core Tech Stack & Tooling", desc: "Found: React, Next.js, Python, TypeScript, SQL..." },
-    { title: "Analyzing Project Complexity & Architecture", desc: "Evaluated fullstack architectures & production APIs..." },
-    { title: "Benchmarking Against Tier-1 Industry Rubrics", desc: "Matching with OpenAI, Linear, Scale AI standards..." },
-    { title: "Synthesizing Multidimensional Career DNA", desc: "Generated tailored career trajectory and learning roadmap..." },
+    { title: "Extracting Core Tech Stack & Tooling", desc: "Analyzing candidate frameworks, languages, and tools..." },
+    { title: "Analyzing Project Complexity & Architecture", desc: "Evaluating system architecture, APIs, and impact metrics..." },
+    { title: "Benchmarking Against Tier-1 Industry Rubrics", desc: "Matching against OpenAI, Linear, Scale AI standards..." },
+    { title: "Synthesizing Multidimensional Career DNA", desc: "Generated tailored career trajectory, radar scores, and learning roadmap..." },
   ];
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,41 +49,7 @@ export default function OnboardingPage() {
     setCurrentStep(0);
 
     if (uploadedBlob) {
-      const fileName = uploadedBlob.name;
-      const cleanName = fileName.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
-      const formattedName = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
-
-      try {
-        const formData = new FormData();
-        formData.append("file", uploadedBlob);
-        fetch("http://localhost:8000/api/v1/resume/upload", {
-          method: "POST",
-          body: formData,
-        }).catch(() => {});
-      } catch {}
-
-      updateProfileFromResume({
-        name: formattedName,
-        title: "AI Product & Software Engineer",
-        summary: `Extracted candidate profile from ${uploadedBlob.name}. High demonstrated capability across modern software architecture and AI integrations.`,
-        careerDNASummary: `Multidimensional candidate evaluated from ${uploadedBlob.name}. High fit for AI Product Engineering and Fullstack AI development.`,
-        radarScores: {
-          technical: 86,
-          analytical: 84,
-          communication: 82,
-          leadership: 78,
-          domainKnowledge: 80,
-        },
-        skills: [
-          { name: "React & Next.js", category: "Technical", proficiency: 90, verified: true },
-          { name: "TypeScript & JavaScript", category: "Technical", proficiency: 88, verified: true },
-          { name: "Python & FastAPI", category: "Technical", proficiency: 85, verified: true },
-          { name: "SQL & Relational Databases", category: "Technical", proficiency: 82, verified: true },
-          { name: "AI APIs & Tool Calling", category: "Technical", proficiency: 86, verified: true },
-          { name: "Problem Decomposition", category: "Analytical", proficiency: 85, verified: true },
-          { name: "Technical Communication", category: "Communication", proficiency: 80, verified: true },
-        ],
-      });
+      await parseAndUploadResumeFile(uploadedBlob);
     }
 
     const interval = setInterval(() => {

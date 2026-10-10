@@ -39,7 +39,7 @@ export default function ProfilePage() {
     updateAvatar,
     generateAIAvatar,
     removeAvatar,
-    updateProfileFromResume,
+    parseAndUploadResumeFile,
     signOut,
   } = usePrototype();
 
@@ -88,102 +88,16 @@ export default function ProfilePage() {
   };
 
   // Handle Resume File Ingestion
-  const handleResumeFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleResumeFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setResumeFileName(file.name);
-      processResumeFile(file);
-    }
-  };
-
-  const processResumeFile = (file: File) => {
-    setIsUploadingResume(true);
-    const fileNameLower = file.name.toLowerCase();
-
-    setTimeout(() => {
-      // Intelligent extractor based on file hints or custom student
-      if (fileNameLower.includes("alex") || fileNameLower.includes("morgan") || fileNameLower.includes("data")) {
-        updateProfileFromResume({
-          name: "Alex Morgan",
-          title: "Aspiring Applied Machine Learning Engineer",
-          university: "UC Berkeley / CS 2025",
-          degree: "B.S. in Computer Science",
-          graduationYear: "2025",
-          summary: "Data scientist and machine learning practitioner with strong mathematical modeling, Python, and SQL experience.",
-          careerDNASummary: "Analytical thinker with deep statistical foundations, seeking applied machine learning engineering roles.",
-          radarScores: {
-            technical: 82,
-            analytical: 88,
-            communication: 76,
-            leadership: 70,
-            domainKnowledge: 84,
-          },
-          skills: [
-            { name: "Python & Pandas", category: "Technical", proficiency: 90, verified: true },
-            { name: "SQL & Data Warehouses", category: "Technical", proficiency: 88, verified: true },
-            { name: "PyTorch & Scikit-Learn", category: "Technical", proficiency: 78, verified: true },
-            { name: "Statistical Modeling", category: "Analytical", proficiency: 85, verified: true },
-            { name: "Technical Writing", category: "Communication", proficiency: 80, verified: true },
-          ],
-        });
-      } else if (fileNameLower.includes("rasika")) {
-        updateProfileFromResume({
-          name: "Rasika Kudale",
-          title: "AI Systems & Full-Stack Architect",
-          university: "Top Tech University",
-          degree: "B.Tech Computer Science & AI",
-          graduationYear: "2026",
-          summary: "AI systems engineer with deep expertise in Next.js, LLM multi-agent pipelines, FastAPI, and reactive full-stack web applications.",
-          careerDNASummary: "Pioneering builder with strong systems engineering foundations and exceptional mastery of full-stack AI orchestration.",
-          radarScores: {
-            technical: 94,
-            analytical: 90,
-            communication: 88,
-            leadership: 85,
-            domainKnowledge: 88,
-          },
-          skills: [
-            { name: "Next.js & React 19", category: "Technical", proficiency: 96, verified: true },
-            { name: "FastAPI & Python 3.12", category: "Technical", proficiency: 92, verified: true },
-            { name: "LangGraph & Agentic Loops", category: "Technical", proficiency: 90, verified: true },
-            { name: "PostgreSQL & Vector Databases", category: "Technical", proficiency: 88, verified: true },
-            { name: "Tailwind CSS & Design Tokens", category: "Technical", proficiency: 95, verified: true },
-            { name: "System Architecture", category: "Analytical", proficiency: 92, verified: true },
-            { name: "Prompt Engineering & Evaluation", category: "Analytical", proficiency: 90, verified: true },
-            { name: "Technical Leadership", category: "Leadership", proficiency: 88, verified: true },
-          ],
-        });
-      } else {
-        // Generic custom candidate extraction
-        const cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
-        updateProfileFromResume({
-          name: cleanName.charAt(0).toUpperCase() + cleanName.slice(1),
-          title: "AI Product & Software Engineer",
-          summary: `Extracted candidate profile from ${file.name}. Demonstrates strong core competencies across modern web engineering and AI pipelines.`,
-          careerDNASummary: `Multidimensional candidate evaluated from ${file.name}. High fit for AI Product Engineering and Fullstack AI development.`,
-          radarScores: {
-            technical: 86,
-            analytical: 84,
-            communication: 82,
-            leadership: 78,
-            domainKnowledge: 80,
-          },
-          skills: [
-            { name: "React & Next.js", category: "Technical", proficiency: 90, verified: true },
-            { name: "TypeScript & JavaScript", category: "Technical", proficiency: 88, verified: true },
-            { name: "Python & FastAPI", category: "Technical", proficiency: 85, verified: true },
-            { name: "SQL & Relational Databases", category: "Technical", proficiency: 82, verified: true },
-            { name: "AI APIs & Tool Calling", category: "Technical", proficiency: 86, verified: true },
-            { name: "Problem Decomposition", category: "Analytical", proficiency: 85, verified: true },
-            { name: "Technical Communication", category: "Communication", proficiency: 80, verified: true },
-          ],
-        });
-      }
-
+      setIsUploadingResume(true);
+      await parseAndUploadResumeFile(file);
       setIsUploadingResume(false);
-      setPhotoFeedback("Resume parsed & Career DNA updated!");
-      setTimeout(() => setPhotoFeedback(null), 3500);
-    }, 1200);
+      setPhotoFeedback(`Resume parsed & stats calibrated from ${file.name}!`);
+      setTimeout(() => setPhotoFeedback(null), 4000);
+    }
   };
 
   const handleSignOut = () => {

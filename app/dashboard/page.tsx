@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
 import {
   Compass,
@@ -13,6 +13,11 @@ import {
   Bookmark,
   CheckCircle2,
   Zap,
+  Upload,
+  FileText,
+  Loader2,
+  AlertCircle,
+  RefreshCw,
 } from "lucide-react";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { RadarChartDNA } from "@/components/dashboard/RadarChartDNA";
@@ -22,6 +27,8 @@ import { usePrototype } from "@/lib/prototype-state";
 
 export default function DashboardPage() {
   const {
+    hasUploadedResume,
+    parseAndUploadResumeFile,
     studentProfile,
     careerPaths,
     selectedCareerId,
@@ -37,10 +44,26 @@ export default function DashboardPage() {
     greeting,
   } = usePrototype();
 
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadSuccessMessage, setUploadSuccessMessage] = useState<string | null>(null);
+
   const topMatches = careerPaths.slice(0, 3);
   const criticalGaps = skillGaps.filter((g) => g.category === "Critical");
   const topMissingSkill = criticalGaps[0]?.name || selectedCareer.keyMissingSkills?.[0] || "Agentic Workflows";
   const potentialLift = Math.min(18, Math.max(8, 99 - selectedCareer.matchScore));
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setIsUploading(true);
+      await new Promise((r) => setTimeout(r, 900));
+      await parseAndUploadResumeFile(file);
+      setIsUploading(false);
+      setUploadSuccessMessage(`Successfully calibrated Career DNA from ${file.name}!`);
+      setTimeout(() => setUploadSuccessMessage(null), 4000);
+    }
+  };
 
   return (
     <AppShell
@@ -48,6 +71,89 @@ export default function DashboardPage() {
       headerSubtitle="Your future is full of possibilities. Let's explore."
     >
       <div className="space-y-6">
+        {/* Hidden Global File Input */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          accept=".pdf,.docx,.txt"
+          className="hidden"
+        />
+
+        {/* UPLOAD RESUME CALLOUT BANNER (Addresses Bug 1 & 2) */}
+        {!hasUploadedResume ? (
+          <SpotlightCard className="p-6 rounded-3xl bg-gradient-to-r from-amber-500/15 via-[var(--bg-card)] to-[var(--accent)]/15 border-2 border-amber-500/40 shadow-2xl relative overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center shrink-0 border border-amber-500/30 shadow-md">
+                  <Upload className="h-6 w-6 animate-bounce" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold uppercase tracking-wider">
+                      Action Required
+                    </span>
+                    <span className="text-xs text-[var(--text-muted)]">Sample Baseline Preview Mode</span>
+                  </div>
+                  <h2 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">
+                    Upload Your Resume to Calibrate Your Live Career DNA &amp; Stats
+                  </h2>
+                  <p className="text-xs text-[var(--text-secondary)] mt-1 max-w-xl">
+                    The scores below are currently showing a baseline preview. Upload your real resume to extract verified skills, unlock tailored career match percentages, and generate your custom 12-week roadmap.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 flex-wrap shrink-0">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="px-5 py-3 rounded-2xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-semibold text-xs transition-all flex items-center gap-2 shadow-xl hover:scale-105 active:scale-95"
+                >
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Calibrating Stats...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="h-4 w-4" />
+                      <span className="shimmer-text">Upload Resume Now</span>
+                    </>
+                  )}
+                </button>
+
+                <Link
+                  href="/onboarding"
+                  className="px-4 py-3 rounded-2xl bg-[var(--bg-card-subtle)] hover:bg-[var(--border-color)] border border-[var(--border-color)] text-xs font-semibold text-[var(--text-primary)] transition-all flex items-center gap-1.5"
+                >
+                  <span>4-Step AI Ingestion</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+            </div>
+          </SpotlightCard>
+        ) : (
+          /* Calibrated Success Bar with Fast In-Place Re-Upload */
+          <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-md">
+            <div className="flex items-center gap-2 text-emerald-400 font-semibold">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+              <span>
+                {uploadSuccessMessage || `Career DNA calibrated for ${studentProfile.name} • ${studentProfile.skills.length} verified skills active`}
+              </span>
+            </div>
+
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[var(--accent)] hover:underline self-start sm:self-auto"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${isUploading ? "animate-spin" : ""}`} />
+              <span>Upload Different Resume</span>
+            </button>
+          </div>
+        )}
+
         {/* TOP ROW: Career DNA + Top Career Matches + What-If Hero Widget */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Card 1: Your Career DNA (4 cols) with Spotlight Effect */}
