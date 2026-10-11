@@ -24,6 +24,8 @@ import {
   Loader2,
   Users,
   Check,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { RadarChartDNA } from "@/components/dashboard/RadarChartDNA";
@@ -41,7 +43,11 @@ export default function ProfilePage() {
     removeAvatar,
     parseAndUploadResumeFile,
     signOut,
+    deleteAllUserData,
   } = usePrototype();
+
+  const [isDeletingData, setIsDeletingData] = useState(false);
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
 
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [isUploadingResume, setIsUploadingResume] = useState(false);
@@ -416,6 +422,89 @@ export default function ProfilePage() {
             </div>
           </div>
         </SpotlightCard>
+
+        {/* Privacy, Retention & Full Data Deletion (Addresses FR-13 & AC-10) */}
+        <SpotlightCard className="rounded-3xl bg-[var(--bg-card)] border border-red-500/30 p-6 sm:p-8 shadow-xl space-y-4">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-red-500/15 text-red-500 flex items-center justify-center shrink-0 border border-red-500/30">
+                <Trash2 className="h-4 w-4" />
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)]">
+                  Data Privacy, Retention &amp; Permanent Deletion
+                </h3>
+                <p className="text-xs text-[var(--text-secondary)]">
+                  Exercise your right to be forgotten. Permanently wipe stored resumes, AI credentials, and interaction logs.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setDeleteConfirmationOpen(true)}
+              className="px-4 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-500 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              <span>Delete All Candidate Data</span>
+            </button>
+          </div>
+        </SpotlightCard>
+
+        {/* 2-Step Confirmation Modal */}
+        {deleteConfirmationOpen && (
+          <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="w-full max-w-md bg-[var(--bg-card)] border border-red-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-red-500/15 text-red-500 flex items-center justify-center mx-auto border border-red-500/30 shadow-lg">
+                <AlertTriangle className="h-7 w-7" />
+              </div>
+
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">
+                  Permanently Delete All Your Data?
+                </h3>
+                <p className="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">
+                  This action cannot be undone. We will permanently delete:
+                </p>
+                <ul className="text-[11px] text-[var(--text-muted)] text-left mt-2.5 space-y-1 list-disc list-inside bg-[var(--bg-card-subtle)] p-3 rounded-xl border border-[var(--border-color)]">
+                  <li>Uploaded resume files from storage</li>
+                  <li>Extracted technical skills and Career DNA</li>
+                  <li>Active 12-week roadmap milestones &amp; history</li>
+                  <li>Custom job descriptions and simulation logs</li>
+                </ul>
+              </div>
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  onClick={() => setDeleteConfirmationOpen(false)}
+                  disabled={isDeletingData}
+                  className="flex-1 py-2.5 rounded-xl bg-[var(--bg-card-subtle)] hover:bg-[var(--border-color)] text-xs font-semibold text-[var(--text-primary)] border border-[var(--border-color)] transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    setIsDeletingData(true);
+                    await deleteAllUserData();
+                    setIsDeletingData(false);
+                    setDeleteConfirmationOpen(false);
+                    router.push("/");
+                  }}
+                  disabled={isDeletingData}
+                  className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold transition-all flex items-center justify-center gap-2 shadow-lg"
+                >
+                  {isDeletingData ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      <span>Deleting Data...</span>
+                    </>
+                  ) : (
+                    <span>Confirm &amp; Delete</span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </AppShell>
   );

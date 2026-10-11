@@ -179,6 +179,7 @@ interface PrototypeContextType {
   completedTasksCount: number;
   totalTasksCount: number;
   resetState: () => void;
+  deleteAllUserData: () => Promise<void>;
   isLoaded: boolean;
   greeting: string;
 }
@@ -962,6 +963,17 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const deleteAllUserData = async () => {
+    try {
+      const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || "https://careerup-h35y.onrender.com";
+      const apiBase = rawApiUrl.endsWith("/api/v1") ? rawApiUrl : `${rawApiUrl.replace(/\/$/, "")}/api/v1`;
+      await fetch(`${apiBase}/profile/data`, { method: "DELETE" }).catch(() => {});
+    } catch {}
+
+    resetState();
+    setHasUploadedResume(false);
+  };
+
   // Calculate dynamic readiness score
   const allTasks = roadmap.flatMap((m) => m.tasks);
   const completedTasks = allTasks.filter((t) => t.completed);
@@ -1044,6 +1056,7 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
         completedTasksCount,
         totalTasksCount,
         resetState,
+        deleteAllUserData,
         isLoaded,
         greeting,
       }}

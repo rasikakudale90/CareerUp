@@ -173,3 +173,60 @@ def generate_career_dna(current_user: User = Depends(get_current_user), db: Sess
 
     return {"status": "success", "data": result}
 
+
+@router.delete("/data")
+def delete_user_career_data(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Secure Account & Resume Deletion Workflow (Addresses FR-13 & AC-10).
+    Deletes stored resume file, wipes profile records, clears skills, and deletes AI interaction logs.
+    """
+    from backend.app.services.storage_adapter import storage_adapter
+
+    profile = db.query(StudentProfile).filter(StudentProfile.user_id == current_user.id).first()
+    deleted_files = 0
+    if profile:
+        # Delete file from storage
+        if profile.resume_file_url:
+            try:
+                storage_adapter.delete_file(profile.resume_file_url)
+                deleted_files += 1
+            except Exception as e:
+                print(f"[Deletion Error] Could not delete file: {e}")
+
+        # Wipe skills, projects, experience
+        db.query(Skill).filter(Skill.profile_id == profile.id).delete()
+        db.query(PortfolioProject).filter(PortfolioProject.profile_id == profile.id).delete()
+        db.query(Experience).filter(Experience.profile_id == profile.id).delete()
+
+        # Reset profile fields
+        profile.raw_resume_text = None
+        profile.resume_file_url = None
+        profile.summary = "Profile reset. Upload your resume to calibrate Career DNA."
+        profile.career_dna_summary = "Uncalibrated baseline."
+        profile.overall_readiness_score = 50
+        profile.radar_scores = {
+            "technical": 60,
+            "analytical": 60,
+            "communication": 60,
+            "leadership": 60,
+            "domainKnowledge": 60
+        }
+        profile.strengths = []
+        profile.blindspots = []
+
+    # Delete AI logs for user
+    db.query(AIInteractionLog).filter(AIInteractionLog.user_id == current_user.id).delete()
+
+    db.commit()
+
+    return {
+        "status": "success",
+        "message": "All candidate resume files, extracted credentials, and AI interaction history have been permanently deleted.",
+        "user_id": current_user.id,
+        "deleted_files_count": deleted_files
+    }
+
+

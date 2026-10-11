@@ -25,6 +25,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Correlation Request ID & Observability Middleware (Addresses FR-14 & AC-12)
+import uuid
+import time
+from fastapi import Request
+
+@app.middleware("http")
+async def add_request_id_and_timing_middleware(request: Request, call_next):
+    request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
+    start_time = time.time()
+    response = await call_next(request)
+    duration = time.time() - start_time
+    response.headers["X-Request-ID"] = request_id
+    response.headers["X-Response-Time"] = f"{duration:.4f}s"
+    return response
+
 # Ensure upload directory exists
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 

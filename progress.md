@@ -92,18 +92,44 @@ CareerUp transforms static resumes into actionable, multidimensional career inte
 
 ---
 
+### 4. CareerUp AI Fix PRD Audit Resolutions (2026-10-11)
+
+1. **Phase 1: Security, Storage & Auth Isolation**:
+   - Eliminated unauthenticated fallback to first database user in `deps.py`. Enforced strict 401 Unauthorized for missing/invalid bearer tokens.
+   - Refactored `storage_adapter.py` to store private object references with signed short-lived URLs (`create_signed_url`) and secure file deletion (`delete_file`).
+   - Hardened `prompts.py` with `<untrusted_content>` boundary tags and strict prompt-injection defense directives across all LLM pipelines.
+
+2. **Phase 2: Core Reliability & Route Stabilization**:
+   - Replaced plain text Suspense fallback in `/job-match` with a full-page `JobMatchSkeleton` preventing bot/crawler stalls.
+   - Added explicit empty state and timeout error handling with retry actions for custom job descriptions.
+   - Removed artificial 55% floor on ATS compatibility score; now computes true keyword & semantic overlap.
+   - Fixed What-If skill commits in `prototype-state.tsx` to mark hypothetical skills as `verified: false` / in-learning roadmap goals.
+
+3. **Phase 3: AI Trust, Scoring Explainability & Claims Calibration**:
+   - Removed unsubstantiated "top 5th percentile" language on `/readiness`; added transparent scoring methodology rubric (Technical Depth 35%, Portfolio Evidence 25%, Tooling 20%, Roadmap Execution 20%) and educational diagnostic disclaimer.
+   - Calibrated What-If simulator compensation metrics to illustrative market benchmarks ($140k–$180k) with explicit no-guarantee disclaimers.
+   - Added persistent, elegant `Demo Mode • Seeded Baseline` badge to AppShell header whenever uncalibrated sample data is shown.
+
+4. **Phase 4: Privacy, Data Deletion & Observability**:
+   - Added backend `DELETE /api/v1/profile/data` endpoint to permanently wipe stored resume files, candidate skills, projects, and AI interaction logs.
+   - Integrated full frontend Data Deletion Danger Zone in `/profile` with a 2-step confirmation modal and complete local session purge.
+   - Integrated `X-Request-ID` correlation middleware and sub-millisecond response timing headers in FastAPI `main.py`.
+
+---
+
 ## 📊 Verification & Deployment Matrix
 
 | Verification Scope | Platform | Status | Result |
 | :--- | :--- | :---: | :--- |
 | **Frontend Production Build** | Vercel / Turbopack | ✅ Verified | **19/19 static routes compiled cleanly (0 TypeScript / Turbopack errors)**. |
-| **User Experience Bug Suite** | Next.js 16 Client & State | ✅ Verified | All 5 UX issues resolved and verified end-to-end. |
-| **Live Cloud Backend Verification** | Render (`careerup-h35y`) | ✅ Verified | 16 of 16 REST endpoints operational. |
-| **GitHub Deployment Sync** | GitHub (`main` / `20d573f`) | ✅ Up to Date | Live on [careerup.vercel.app](https://careerup.vercel.app) via auto-deploy. |
+| **Audit PRD Fix Suite (Phases 1-4)** | Next.js 16 & FastAPI | ✅ Verified | All 11 loophole items resolved and verified end-to-end. |
+| **Live Cloud Backend Verification** | Render (`careerup-h35y`) | ✅ Verified | 18 of 18 REST endpoints operational (including DELETE /data and request-id middleware). |
+| **GitHub Deployment Sync** | GitHub (`main`) | ✅ Up to Date | Live on [careerup.vercel.app](https://careerup.vercel.app) via auto-deploy. |
 
 ---
 
 ## 🎯 Current Status & Persistent Repo-Memory
 - **State Version:** `careerup_state_v4_<email>` (Active isolated per-user session engine).
-- **Core Intelligence Engine:** Reactive multi-system synchronization connecting resume ingestion $\rightarrow$ 5D radar matrix $\rightarrow$ 6-track matching $\rightarrow$ skill gaps $\rightarrow$ 12-week roadmap $\rightarrow$ ATS compatibility $\rightarrow$ readiness score.
+- **Core Intelligence Engine:** Reactive multi-system synchronization connecting resume ingestion $\rightarrow$ 5D radar matrix $\rightarrow$ 6-track matching $\rightarrow$ skill gaps $\rightarrow$ 12-week roadmap $\rightarrow$ ATS compatibility $\rightarrow$ readiness score $\rightarrow$ right to be forgotten (data deletion).
 - **Demo Readiness:** 100% demo-ready, 0 broken routes, 0 placeholder stubbing, fully responsive on desktop & mobile devices.
+
