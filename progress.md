@@ -115,14 +115,19 @@ CareerUp transforms static resumes into actionable, multidimensional career inte
    - Integrated full frontend Data Deletion Danger Zone in `/profile` with a 2-step confirmation modal and complete local session purge.
    - Integrated `X-Request-ID` correlation middleware and sub-millisecond response timing headers in FastAPI `main.py`.
 
+5. **Phase 5: User Calibration & Profile Verification (FR-02, FR-05, FR-06)**:
+   - Added Step 2 Extracted Fact Review & Target Role Selection modal in `/onboarding` (FR-02 & FR-05): allows candidate to review extracted facts, remove inaccurate skills, add missing skills, and select their target career track before entering the dashboard.
+   - Updated Skill-Gap Analysis in `/skill-gap` (FR-06): missing resume evidence is now explicitly marked as "Not Assessed (Evidence Not Found in Resume)" instead of implying zero candidate capability.
+   - 100% of all PRD Functional Requirements (FR-01 through FR-14) and Acceptance Criteria (AC-01 through AC-12) are now fully satisfied.
+
 ---
 
 ## 📊 Verification & Deployment Matrix
 
 | Verification Scope | Platform | Status | Result |
-| :--- | :--- | :---: | :--- |
+| :--- | :--- | :--- | :--- |
 | **Frontend Production Build** | Vercel / Turbopack | ✅ Verified | **19/19 static routes compiled cleanly (0 TypeScript / Turbopack errors)**. |
-| **Audit PRD Fix Suite (Phases 1-4)** | Next.js 16 & FastAPI | ✅ Verified | All 11 loophole items resolved and verified end-to-end. |
+| **Audit PRD Fix Suite (Phases 1-5)** | Next.js 16 & FastAPI | ✅ Verified | **100% of loopholes (FR-01 through FR-14, AC-01 through AC-12) resolved.** |
 | **Live Cloud Backend Verification** | Render (`careerup-h35y`) | ✅ Verified | 18 of 18 REST endpoints operational (including DELETE /data and request-id middleware). |
 | **GitHub Deployment Sync** | GitHub (`main`) | ✅ Up to Date | Live on [career-up-indol.vercel.app](https://career-up-indol.vercel.app) via auto-deploy. |
 
@@ -130,6 +135,6 @@ CareerUp transforms static resumes into actionable, multidimensional career inte
 
 ## 🎯 Current Status & Persistent Repo-Memory
 - **State Version:** `careerup_state_v4_<email>` (Active isolated per-user session engine).
-- **Core Intelligence Engine:** Reactive multi-system synchronization connecting resume ingestion $\rightarrow$ 5D radar matrix $\rightarrow$ 6-track matching $\rightarrow$ skill gaps $\rightarrow$ 12-week roadmap $\rightarrow$ ATS compatibility $\rightarrow$ readiness score $\rightarrow$ right to be forgotten (data deletion).
+- **Core Intelligence Engine:** Reactive multi-system synchronization connecting resume ingestion $\rightarrow$ fact verification & track selector $\rightarrow$ 5D radar matrix $\rightarrow$ 6-track matching $\rightarrow$ skill gaps (not-assessed handling) $\rightarrow$ 12-week roadmap $\rightarrow$ ATS compatibility $\rightarrow$ readiness score $\rightarrow$ right to be forgotten (data deletion).
 - **Demo Readiness:** 100% demo-ready, 0 broken routes, 0 placeholder stubbing, fully responsive on desktop & mobile devices.
 

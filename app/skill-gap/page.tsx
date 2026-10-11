@@ -126,11 +126,16 @@ export default function SkillGapPage() {
                   </div>
                 </div>
 
-                {/* Level Comparison Bar */}
+                {/* Level Comparison Bar (Addresses FR-06: Missing evidence marked as Not Assessed) */}
                 <div className="space-y-1.5 p-4 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-subtle)]">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-[var(--text-secondary)]">Current Proficiency: <strong className="text-[var(--text-primary)]">{gap.currentLevel}%</strong></span>
-                    <span className="text-[var(--text-secondary)]">Required for Tier-1: <strong className="text-[var(--accent)]">{gap.requiredLevel}%</strong></span>
+                    <span className="text-[var(--text-secondary)]">
+                      Current Evidence:{" "}
+                      <strong className={gap.currentLevel > 30 ? "text-[var(--text-primary)]" : "text-amber-500 font-semibold"}>
+                        {gap.currentLevel > 30 ? `${gap.currentLevel}% Proficiency` : "Not Assessed (Evidence Not Found in Resume)"}
+                      </strong>
+                    </span>
+                    <span className="text-[var(--text-secondary)]">Required Hiring Bar: <strong className="text-[var(--accent)]">{gap.requiredLevel}%</strong></span>
                   </div>
 
                   <div className="w-full h-3 rounded-full bg-[var(--bg-primary)] relative overflow-hidden border border-[var(--border-subtle)]">
@@ -141,8 +146,8 @@ export default function SkillGapPage() {
                     />
                     {/* Current Student Level */}
                     <div
-                      className="absolute top-0 bottom-0 bg-[var(--accent)] rounded-full shadow-lg"
-                      style={{ width: `${gap.currentLevel}%` }}
+                      className={`absolute top-0 bottom-0 rounded-full shadow-lg ${gap.currentLevel > 30 ? "bg-[var(--accent)]" : "bg-amber-500/50"}`}
+                      style={{ width: `${Math.max(8, gap.currentLevel)}%` }}
                     />
                   </div>
                 </div>
