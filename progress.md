@@ -7,7 +7,9 @@
 **Backend Live Deployment:** [https://careerup-h35y.onrender.com](https://careerup-h35y.onrender.com) (Swagger UI: [`/docs`](https://careerup-h35y.onrender.com/docs))  
 **Cloud Storage & Database:** Supabase (PostgreSQL Transaction Pooler + S3 Storage Bucket `resumes`)  
 **GitHub Repository:** [https://github.com/rasikakudale90/CareerUp](https://github.com/rasikakudale90/CareerUp)  
-**Status Date:** 2026-10-10  
+**Permanent Repo-Memory:** [`REPO_MEMORY.md`](file:///e:/Ai%20career/REPO_MEMORY.md)  
+**Status Date:** 2026-10-11  
+**Lead / Principal:** Rasika Babe  
 
 ---
 
