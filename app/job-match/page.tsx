@@ -213,70 +213,85 @@ function JobMatchContent() {
     setTimeout(() => setCopiedBullet(false), 2000);
   };
 
+  const [parseError, setParseError] = useState<string | null>(null);
+
   const handleParseCustomJD = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!customJD.trim() || !customRoleTitle.trim()) return;
+    setParseError(null);
+    if (!customJD.trim() || !customRoleTitle.trim()) {
+      setParseError("Please provide both a role title and job description text.");
+      return;
+    }
 
     setIsParsing(true);
-    setTimeout(() => {
-      const KNOWN_TECH_KEYWORDS = [
-        "TypeScript", "JavaScript", "React", "Next.js", "Python", "FastAPI", "Node.js",
-        "Tailwind CSS", "GraphQL", "REST APIs", "WebSockets", "Docker", "Kubernetes",
-        "PostgreSQL", "MongoDB", "Redis", "Vector DB", "Vector Search", "Qdrant", "Pinecone",
-        "LangChain", "LangGraph", "LlamaIndex", "AI SDK", "PyTorch", "TensorFlow",
-        "LLM APIs", "Gemini", "OpenAI", "Prompt Engineering", "Fine-Tuning", "RAG Systems",
-        "Streaming UI", "CI/CD", "System Design", "Microservices", "AWS", "Agentic Tooling"
-      ];
+    // Safe timeout guard
+    const timeoutId = setTimeout(() => {
+      try {
+        const KNOWN_TECH_KEYWORDS = [
+          "TypeScript", "JavaScript", "React", "Next.js", "Python", "FastAPI", "Node.js",
+          "Tailwind CSS", "GraphQL", "REST APIs", "WebSockets", "Docker", "Kubernetes",
+          "PostgreSQL", "MongoDB", "Redis", "Vector DB", "Vector Search", "Qdrant", "Pinecone",
+          "LangChain", "LangGraph", "LlamaIndex", "AI SDK", "PyTorch", "TensorFlow",
+          "LLM APIs", "Gemini", "OpenAI", "Prompt Engineering", "Fine-Tuning", "RAG Systems",
+          "Streaming UI", "CI/CD", "System Design", "Microservices", "AWS", "Agentic Tooling"
+        ];
 
-      const jdText = `${customRoleTitle} ${customJD}`.toLowerCase();
-      const detectedSkills = KNOWN_TECH_KEYWORDS.filter((tech) =>
-        jdText.includes(tech.toLowerCase())
-      );
+        const jdText = `${customRoleTitle} ${customJD}`.toLowerCase();
+        const detectedSkills = KNOWN_TECH_KEYWORDS.filter((tech) =>
+          jdText.includes(tech.toLowerCase())
+        );
 
-      const requiredSkills = detectedSkills.length > 0 
-        ? detectedSkills 
-        : ["TypeScript", "React", "FastAPI", "LLM APIs", "System Architecture"];
+        const requiredSkills = detectedSkills.length > 0 
+          ? detectedSkills 
+          : ["TypeScript", "React", "FastAPI", "LLM APIs", "System Architecture"];
 
-      const candidateSkills = (studentProfile?.skills || []).map((s) =>
-        (typeof s === "string" ? s : s.name).toLowerCase()
-      );
+        const candidateSkills = (studentProfile?.skills || []).map((s) =>
+          (typeof s === "string" ? s : s.name).toLowerCase()
+        );
 
-      const matchedSkills = requiredSkills.filter((sk) =>
-        candidateSkills.some((cs) => cs.includes(sk.toLowerCase()) || sk.toLowerCase().includes(cs))
-      );
+        const matchedSkills = requiredSkills.filter((sk) =>
+          candidateSkills.some((cs) => cs.includes(sk.toLowerCase()) || sk.toLowerCase().includes(cs))
+        );
 
-      const missingSkills = requiredSkills.filter((sk) => !matchedSkills.includes(sk));
+        const missingSkills = requiredSkills.filter((sk) => !matchedSkills.includes(sk));
 
-      const matchPct = Math.min(
-        98,
-        Math.max(
-          55,
-          Math.round((matchedSkills.length / Math.max(1, requiredSkills.length)) * 100)
-        )
-      );
+        // Exact match percentage without artificial floor
+        const matchPct = Math.min(
+          99,
+          Math.max(
+            0,
+            Math.round((matchedSkills.length / Math.max(1, requiredSkills.length)) * 100)
+          )
+        );
 
-      addCustomJobMatch({
-        id: `custom-job-${Date.now()}`,
-        company: customCompany || "Target Tech Co.",
-        companyLogo:
-          "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=80",
-        title: customRoleTitle,
-        location: "Remote / Hybrid",
-        workType: "Remote",
-        salaryRange: "$150,000 – $190,000",
-        matchPercentage: matchPct,
-        postedDate: "Parsed Just Now",
-        requiredSkills,
-        matchedSkills,
-        missingSkills,
-        description: customJD,
-      });
-      setIsParsing(false);
-      setActiveTab("browse");
-      setCustomRoleTitle("");
-      setCustomCompany("");
-      setCustomJD("");
+        addCustomJobMatch({
+          id: `custom-job-${Date.now()}`,
+          company: customCompany || "Target Tech Co.",
+          companyLogo:
+            "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=80",
+          title: customRoleTitle,
+          location: "Remote / Hybrid (US)",
+          workType: "Remote",
+          salaryRange: "$135,000 – $175,000 (Illustrative market benchmark)",
+          matchPercentage: matchPct,
+          postedDate: "Parsed Just Now",
+          requiredSkills,
+          matchedSkills,
+          missingSkills,
+          description: customJD,
+        });
+        setIsParsing(false);
+        setActiveTab("browse");
+        setCustomRoleTitle("");
+        setCustomCompany("");
+        setCustomJD("");
+      } catch (err) {
+        setIsParsing(false);
+        setParseError("Failed to parse job description. Please check the text and try again.");
+      }
     }, 700);
+
+    return () => clearTimeout(timeoutId);
   };
 
   const activeBridgeDetails = activeModalSkill ? getSkillBridgeDetails(activeModalSkill.skill) : null;
@@ -326,177 +341,207 @@ function JobMatchContent() {
         </div>
 
         {activeTab === "browse" ? (
-          /* Job Cards List */
-          <div className="space-y-4">
-            {jobMatches.map((job) => {
-              // Calculate dynamically bridged skills
-              const actuallyMissing = job.missingSkills.filter((sk) => !isSkillBridged(sk));
-              const bridgedSkills = job.missingSkills.filter((sk) => isSkillBridged(sk));
-              const dynamicMatch = Math.min(
-                99,
-                job.matchPercentage + bridgedSkills.length * 7
-              );
+          /* Job Cards List or Empty State */
+          jobMatches.length === 0 ? (
+            <SpotlightCard className="rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] p-8 text-center space-y-4 shadow-xl">
+              <div className="w-12 h-12 rounded-2xl bg-[var(--accent-soft)] text-[var(--accent)] mx-auto flex items-center justify-center">
+                <Briefcase className="h-6 w-6" />
+              </div>
+              <h3 className="text-base font-bold text-[var(--text-primary)]">No Active Job Matches Found</h3>
+              <p className="text-xs text-[var(--text-secondary)] max-w-md mx-auto">
+                No job postings currently match your criteria. You can analyze any custom job description or explore career tracks.
+              </p>
+              <button
+                onClick={() => setActiveTab("custom")}
+                className="px-4 py-2 rounded-xl bg-[var(--accent)] text-white text-xs font-semibold hover:bg-[var(--accent-hover)] transition-all shadow-md"
+              >
+                Analyze Custom Job Description
+              </button>
+            </SpotlightCard>
+          ) : (
+            <div className="space-y-4">
+              {jobMatches.map((job) => {
+                // Calculate dynamically bridged skills
+                const actuallyMissing = job.missingSkills.filter((sk) => !isSkillBridged(sk));
+                const bridgedSkills = job.missingSkills.filter((sk) => isSkillBridged(sk));
+                const dynamicMatch = Math.min(
+                  99,
+                  job.matchPercentage + bridgedSkills.length * 7
+                );
 
-              return (
-                <SpotlightCard
-                  key={job.id}
-                  className="rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] p-6 shadow-xl space-y-4 transition-all"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={job.companyLogo}
-                        alt={job.company}
-                        className="w-12 h-12 rounded-2xl object-cover border border-[var(--border-color)]"
-                      />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold text-[var(--text-primary)]">{job.company}</span>
-                          <span className="text-[var(--text-muted)]">•</span>
-                          <span className="text-xs text-[var(--text-secondary)]">{job.location}</span>
+                return (
+                  <SpotlightCard
+                    key={job.id}
+                    className="rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] p-6 shadow-xl space-y-4 transition-all"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={job.companyLogo}
+                          alt={job.company}
+                          className="w-12 h-12 rounded-2xl object-cover border border-[var(--border-color)]"
+                        />
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-[var(--text-primary)]">{job.company}</span>
+                            <span className="text-[var(--text-muted)]">•</span>
+                            <span className="text-xs text-[var(--text-secondary)]">{job.location}</span>
+                          </div>
+                          <h3 className="text-base font-bold text-[var(--text-primary)] tracking-tight mt-0.5">
+                            {job.title}
+                          </h3>
                         </div>
-                        <h3 className="text-base font-bold text-[var(--text-primary)] tracking-tight mt-0.5">
-                          {job.title}
-                        </h3>
+                      </div>
+
+                      <div className="flex items-center gap-4 self-start sm:self-auto">
+                        <div className="text-right">
+                          <div
+                            className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                              dynamicMatch >= 95
+                                ? "bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 shadow-md"
+                                : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-500"
+                            }`}
+                          >
+                            {dynamicMatch}% ATS Fit {bridgedSkills.length > 0 && "(+Bridged)"}
+                          </div>
+                          <span className="text-[10px] text-[var(--text-muted)] block mt-0.5">{job.salaryRange}</span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 self-start sm:self-auto">
-                      <div className="text-right">
-                        <div
-                          className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
-                            dynamicMatch >= 95
-                              ? "bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 shadow-md"
-                              : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-500"
+                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{job.description}</p>
+
+                    {/* Skills Breakdown */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-xs">
+                      <div>
+                        <span className="text-[10px] font-bold uppercase text-emerald-500 block mb-1.5 flex items-center gap-1">
+                          <CheckCircle2 className="h-3 w-3" />
+                          <span>Matching Verified Skills ({job.matchedSkills.length + bridgedSkills.length})</span>
+                        </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {job.matchedSkills.map((sk) => (
+                            <span
+                              key={sk}
+                              className="px-2 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-300 text-[11px]"
+                            >
+                              {sk}
+                            </span>
+                          ))}
+                          {bridgedSkills.map((sk) => (
+                            <span
+                              key={sk}
+                              className="px-2 py-0.5 rounded-md bg-[var(--accent-soft)] border border-[var(--accent)]/40 text-[var(--accent)] text-[11px] font-bold flex items-center gap-1 shimmer-badge"
+                            >
+                              <Sparkles className="h-3 w-3" />
+                              <span>{sk} (Bridged)</span>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        {actuallyMissing.length === 0 ? (
+                          <div>
+                            <span className="text-[10px] font-bold uppercase text-emerald-500 block mb-1.5 flex items-center gap-1">
+                              <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                              <span>Zero Missing Requirements (100% Covered)</span>
+                            </span>
+                            <div className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                              <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
+                              <span>All hiring requirements are fully satisfied!</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <span className="text-[10px] font-bold uppercase text-amber-500 dark:text-amber-400 block mb-1.5 flex items-center justify-between">
+                              <span className="flex items-center gap-1">
+                                <XCircle className="h-3 w-3 text-red-500" />
+                                <span>Missing Bridge Requirements ({actuallyMissing.length})</span>
+                              </span>
+                              <span className="text-[10px] text-[var(--text-muted)] lowercase font-normal">
+                                (click to bridge)
+                              </span>
+                            </span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {actuallyMissing.map((sk) => (
+                                <button
+                                  key={sk}
+                                  onClick={() => handleOpenBridgeModal(sk, job.title, job.company)}
+                                  className="px-2.5 py-1 rounded-md bg-red-500/10 hover:bg-red-500/25 border border-red-500/30 text-red-600 dark:text-red-300 text-[11px] font-medium transition-all flex items-center gap-1.5 group/skill shadow-sm active:scale-95"
+                                  title="Click for AI skill bridge options"
+                                >
+                                  <span>{sk}</span>
+                                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 font-bold group-hover/skill:bg-red-500 group-hover/skill:text-white transition-all">
+                                    ⚡ Bridge
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Card Actions */}
+                    <div className="flex items-center justify-between pt-2 border-t border-[var(--border-color)]">
+                      <span className="text-[11px] text-[var(--text-muted)]">Posted {job.postedDate}</span>
+
+                      <div className="flex items-center gap-2.5">
+                        <Link
+                          href="/roadmap"
+                          className="px-3.5 py-1.5 rounded-xl bg-[var(--bg-card-subtle)] hover:bg-[var(--border-color)] text-xs font-semibold text-[var(--text-primary)] transition-colors border border-[var(--border-color)]"
+                        >
+                          Close Skill Gaps
+                        </Link>
+
+                        <button
+                          onClick={() => applyToJob(job.id)}
+                          disabled={job.applied}
+                          className={`px-4 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md ${
+                            job.applied
+                              ? "bg-emerald-600 text-white cursor-default"
+                              : "bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white"
                           }`}
                         >
-                          {dynamicMatch}% ATS Fit {bridgedSkills.length > 0 && "(+Bridged)"}
-                        </div>
-                        <span className="text-[10px] text-[var(--text-muted)] block mt-0.5">{job.salaryRange}</span>
+                          {job.applied ? (
+                            <>
+                              <Check className="h-3.5 w-3.5" />
+                              <span>Applied via Portfolio</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>Apply with Verified DNA</span>
+                              <ArrowRight className="h-3.5 w-3.5" />
+                            </>
+                          )}
+                        </button>
                       </div>
                     </div>
-                  </div>
+                  </SpotlightCard>
+                );
+              })}
 
-                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{job.description}</p>
-
-                  {/* Skills Breakdown */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-xs">
-                    <div>
-                      <span className="text-[10px] font-bold uppercase text-emerald-500 block mb-1.5 flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3" />
-                        <span>Matching Verified Skills ({job.matchedSkills.length + bridgedSkills.length})</span>
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {job.matchedSkills.map((sk) => (
-                          <span
-                            key={sk}
-                            className="px-2 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-300 text-[11px]"
-                          >
-                            {sk}
-                          </span>
-                        ))}
-                        {bridgedSkills.map((sk) => (
-                          <span
-                            key={sk}
-                            className="px-2 py-0.5 rounded-md bg-[var(--accent-soft)] border border-[var(--accent)]/40 text-[var(--accent)] text-[11px] font-bold flex items-center gap-1 shimmer-badge"
-                          >
-                            <Sparkles className="h-3 w-3" />
-                            <span>{sk} (Bridged)</span>
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      {actuallyMissing.length === 0 ? (
-                        <div>
-                          <span className="text-[10px] font-bold uppercase text-emerald-500 block mb-1.5 flex items-center gap-1">
-                            <CheckCircle2 className="h-3 w-3 text-emerald-400" />
-                            <span>Zero Missing Requirements (100% Covered)</span>
-                          </span>
-                          <div className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                            <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
-                            <span>All hiring requirements are fully satisfied!</span>
-                          </div>
-                        </div>
-                      ) : (
-                        <div>
-                          <span className="text-[10px] font-bold uppercase text-amber-500 dark:text-amber-400 block mb-1.5 flex items-center justify-between">
-                            <span className="flex items-center gap-1">
-                              <XCircle className="h-3 w-3 text-red-500" />
-                              <span>Missing Bridge Requirements ({actuallyMissing.length})</span>
-                            </span>
-                            <span className="text-[10px] text-[var(--text-muted)] lowercase font-normal">
-                              (click to bridge)
-                            </span>
-                          </span>
-                          <div className="flex flex-wrap gap-1.5">
-                            {actuallyMissing.map((sk) => (
-                              <button
-                                key={sk}
-                                onClick={() => handleOpenBridgeModal(sk, job.title, job.company)}
-                                className="px-2.5 py-1 rounded-md bg-red-500/10 hover:bg-red-500/25 border border-red-500/30 text-red-600 dark:text-red-300 text-[11px] font-medium transition-all flex items-center gap-1.5 group/skill shadow-sm active:scale-95"
-                                title="Click for AI skill bridge options"
-                              >
-                                <span>{sk}</span>
-                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 font-bold group-hover/skill:bg-red-500 group-hover/skill:text-white transition-all">
-                                  ⚡ Bridge
-                                </span>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Card Actions */}
-                  <div className="flex items-center justify-between pt-2 border-t border-[var(--border-color)]">
-                    <span className="text-[11px] text-[var(--text-muted)]">Posted {job.postedDate}</span>
-
-                    <div className="flex items-center gap-2.5">
-                      <Link
-                        href="/roadmap"
-                        className="px-3.5 py-1.5 rounded-xl bg-[var(--bg-card-subtle)] hover:bg-[var(--border-color)] text-xs font-semibold text-[var(--text-primary)] transition-colors border border-[var(--border-color)]"
-                      >
-                        Close Skill Gaps
-                      </Link>
-
-                      <button
-                        onClick={() => applyToJob(job.id)}
-                        disabled={job.applied}
-                        className={`px-4 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md ${
-                          job.applied
-                            ? "bg-emerald-600 text-white cursor-default"
-                            : "bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white"
-                        }`}
-                      >
-                        {job.applied ? (
-                          <>
-                            <Check className="h-3.5 w-3.5" />
-                            <span>Applied via Portfolio</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>Apply with Verified DNA</span>
-                            <ArrowRight className="h-3.5 w-3.5" />
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </SpotlightCard>
-              );
-            })}
-          </div>
+              {/* Sourced Salary & Benchmark Disclaimer */}
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-[11px] text-[var(--text-secondary)] text-center leading-relaxed">
+                ℹ️ <strong>Methodology Note:</strong> Salary ranges and ATS fit percentages reflect public 2025–2026 tech compensation benchmarks (Levels.fyi, Radford US Remote data). Individual offers and ATS screening rules depend on each employer&apos;s internal rubric.
+              </div>
+            </div>
+          )
         ) : (
           /* Custom JD Parser Form */
           <SpotlightCard className="rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] p-6 sm:p-8 shadow-2xl">
             <h3 className="text-base font-bold text-[var(--text-primary)] mb-2">Analyze Any Tech Job Posting</h3>
             <p className="text-xs text-[var(--text-secondary)] mb-6">
-              Paste the job description from Greenhouse, Lever, LinkedIn, or Workday to compute your ATS fit score and highlight required bridges.
+              Paste the job description from Greenhouse, Lever, LinkedIn, or Workday to compute your true ATS fit score and highlight required bridges.
             </p>
+
+            {parseError && (
+              <div className="mb-4 p-3.5 rounded-2xl bg-red-500/15 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">
+                <XCircle className="h-4 w-4 shrink-0" />
+                <span>{parseError}</span>
+              </div>
+            )}
 
             <form onSubmit={handleParseCustomJD} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -675,9 +720,39 @@ function JobMatchContent() {
   );
 }
 
+function JobMatchSkeleton() {
+  return (
+    <AppShell
+      headerTitle="ATS Job Description Compatibility Engine"
+      headerSubtitle="Loading verified tech openings and requirement analysis..."
+    >
+      <div className="space-y-6 animate-pulse">
+        <div className="h-10 w-64 bg-[var(--bg-card-subtle)] rounded-full border border-[var(--border-color)]" />
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] p-6 space-y-4"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-[var(--bg-card-subtle)]" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-4 w-48 bg-[var(--bg-card-subtle)] rounded" />
+                  <div className="h-3 w-32 bg-[var(--bg-card-subtle)] rounded" />
+                </div>
+              </div>
+              <div className="h-16 w-full bg-[var(--bg-card-subtle)] rounded-2xl" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </AppShell>
+  );
+}
+
 export default function JobMatchPage() {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-[var(--bg-primary)] p-8 text-center text-xs text-[var(--text-muted)] flex items-center justify-center">Loading ATS Job Match Engine...</div>}>
+    <React.Suspense fallback={<JobMatchSkeleton />}>
       <JobMatchContent />
     </React.Suspense>
   );

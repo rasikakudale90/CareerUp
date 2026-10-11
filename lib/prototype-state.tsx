@@ -836,8 +836,8 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
         .map((s) => ({
           name: s.name,
           category: (s.category.includes("AI") || s.category.includes("Architecture") ? "Technical" : "Analytical") as any,
-          proficiency: 85,
-          verified: true,
+          proficiency: 75,
+          verified: false, // In-learning roadmap target; strictly not marked verified without completed project proof
         }));
 
       return {
