@@ -57,7 +57,7 @@ export default function WhatIfPage() {
   const totalLift =
     simulatedSkills.filter((s) => s.added).reduce((sum, s) => sum + Math.round(s.impactScore * 0.5), 0);
 
-  const projectedSalaryLift = totalLift > 0 ? `+$${(totalLift * 2200).toLocaleString()}` : "$0";
+  const benchmarkCompRange = totalLift > 0 ? "$145k – $185k" : "$130k – $165k";
 
   const handleAddCustomSkill = (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,10 +147,15 @@ export default function WhatIfPage() {
               </div>
               <div className="h-8 w-px bg-[var(--border-color)]" />
               <div className="text-center">
-                <span className="text-[10px] text-[var(--text-muted)] uppercase font-bold block">Est. Comp Lift</span>
-                <span className="text-xl font-bold text-[var(--text-primary)]">{projectedSalaryLift}</span>
+                <span className="text-[10px] text-[var(--text-muted)] uppercase font-bold block">Benchmark Comp</span>
+                <span className="text-base sm:text-lg font-bold text-[var(--text-primary)]">{benchmarkCompRange}</span>
               </div>
             </div>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-[var(--border-color)] text-[10px] text-[var(--text-secondary)] flex items-center justify-between flex-wrap gap-2">
+            <span>ℹ️ <strong>Illustrative Benchmark:</strong> Salary ranges reflect public 2025–2026 tech compensation bands (Levels.fyi). Simulation does not guarantee employment or compensation offers.</span>
+            <span className="text-[var(--accent)] font-semibold">Scenario Sandbox Only</span>
           </div>
         </div>
 
@@ -179,8 +184,8 @@ export default function WhatIfPage() {
                 </div>
                 <div className="h-7 w-px bg-[var(--border-color)]" />
                 <div>
-                  <span className="text-[10px] text-[var(--text-muted)] uppercase font-bold block">Projected Starting Comp</span>
-                  <span className="text-lg font-bold text-[var(--accent)]">{projectedSalaryLift} /yr</span>
+                  <span className="text-[10px] text-[var(--text-muted)] uppercase font-bold block">Benchmark Market Comp</span>
+                  <span className="text-lg font-bold text-[var(--accent)]">{benchmarkCompRange}</span>
                 </div>
               </div>
             </div>

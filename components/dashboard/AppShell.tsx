@@ -45,6 +45,7 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
     isLoaded,
     unreadNotificationsCount,
     greeting,
+    hasUploadedResume,
   } = usePrototype();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -270,9 +271,17 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
 
             {/* Title / Greeting */}
             <div>
-              <h1 className="text-xs sm:text-base font-bold text-[var(--text-primary)] tracking-tight flex items-center gap-2">
-                {headerTitle || `${greeting}, ${studentProfile.name.split(" ")[0]} 👋`}
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xs sm:text-base font-bold text-[var(--text-primary)] tracking-tight">
+                  {headerTitle || `${greeting}, ${studentProfile.name.split(" ")[0]} 👋`}
+                </h1>
+                {!hasUploadedResume && (
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-500 text-[10px] font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    <span>Demo Mode</span>
+                  </span>
+                )}
+              </div>
               <p className="text-[11px] text-[var(--text-secondary)] hidden sm:block">
                 {headerSubtitle || "Your future is full of possibilities. Let's explore."}
               </p>

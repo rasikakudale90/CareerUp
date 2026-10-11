@@ -44,22 +44,22 @@ export default function ReadinessPage() {
                 <span className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider block">
                   Overall Readiness Score
                 </span>
-                <span className="text-[11px] text-emerald-500 font-semibold">Tier-1 Competitive</span>
+                <span className="text-[11px] text-emerald-500 font-semibold">Strong Alignment</span>
               </div>
             </div>
 
             <div className="md:col-span-8 space-y-4">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-xs text-[var(--text-secondary)]">
                 <ShieldCheck className="h-3.5 w-3.5 text-[var(--accent)]" />
-                <span>AI Recruiter Synthesis</span>
+                <span>Deterministic Scoring Engine</span>
               </div>
 
               <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
-                Profile Status: Strongly Positioned for {selectedCareer?.title || "AI Product Engineering"} Roles
+                Profile Status: High Evidence Alignment for {selectedCareer?.title || "AI Product Engineering"} Roles
               </h2>
 
               <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                Your portfolio projects demonstrate exceptional craft in streaming AI user experiences. Completing your remaining {Math.max(0, totalTasksCount - completedTasksCount)} roadmap tasks will firmly place you in the top 5th percentile of new grad and junior applicants.
+                Your portfolio projects demonstrate tangible code evidence in modern full-stack systems and reactive user interfaces. Completing your remaining {Math.max(0, totalTasksCount - completedTasksCount)} roadmap tasks will address critical hiring requirements for this track.
               </p>
 
               <div className="flex flex-wrap gap-3 pt-2">
@@ -139,6 +139,51 @@ export default function ReadinessPage() {
             </ul>
           </SpotlightCard>
         </div>
+
+        {/* Transparent Scoring Methodology Breakdown (Addresses FR-07 & AC-06) */}
+        <SpotlightCard className="rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] p-6 shadow-xl space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-bold text-[var(--text-primary)]">Scoring Methodology &amp; Weight Architecture</h3>
+              <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">
+                Deterministic calculation grounded in verified candidate facts and milestone completion.
+              </p>
+            </div>
+            <span className="text-[10px] px-2.5 py-1 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] font-bold border border-[var(--accent)]/30">
+              v4.2 Deterministic
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+            <div className="p-3.5 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] space-y-1">
+              <span className="text-[10px] font-bold uppercase text-[var(--accent)]">35% Weight</span>
+              <div className="font-bold text-[var(--text-primary)]">Technical Depth</div>
+              <p className="text-[10px] text-[var(--text-secondary)]">Languages, frameworks &amp; architectural patterns found in projects.</p>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] space-y-1">
+              <span className="text-[10px] font-bold uppercase text-emerald-400">25% Weight</span>
+              <div className="font-bold text-[var(--text-primary)]">Portfolio Evidence</div>
+              <p className="text-[10px] text-[var(--text-secondary)]">Public GitHub repos, production links &amp; commit histories.</p>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] space-y-1">
+              <span className="text-[10px] font-bold uppercase text-blue-400">20% Weight</span>
+              <div className="font-bold text-[var(--text-primary)]">Tooling &amp; Cloud</div>
+              <p className="text-[10px] text-[var(--text-secondary)]">Docker, CI/CD, vector search, Redis caching &amp; database schemas.</p>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] space-y-1">
+              <span className="text-[10px] font-bold uppercase text-purple-400">20% Weight</span>
+              <div className="font-bold text-[var(--text-primary)]">Roadmap Execution</div>
+              <p className="text-[10px] text-[var(--text-secondary)]">Verified tasks completed in candidate active 12-week plan.</p>
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-[11px] text-[var(--text-secondary)] leading-relaxed">
+            ℹ️ <strong>Educational Notice:</strong> The CareerUp Readiness Score is an educational diagnostic model designed to highlight strengths and bridgeable gaps. It does not constitute an employment guarantee, placement warranty, or automated hiring evaluation.
+          </div>
+        </SpotlightCard>
       </div>
     </AppShell>
   );
