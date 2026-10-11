@@ -2,7 +2,7 @@
 
 **Platform:** CareerUp — AI Student Career Intelligence Platform  
 **Frontend Stack:** Next.js 16 (App Router / Turbopack), TypeScript, Tailwind CSS, GSAP, Three.js, Lenis, Framer Motion  
-**Frontend Live Deployment:** [https://careerup.vercel.app](https://careerup.vercel.app)  
+**Frontend Live Deployment:** [https://career-up-indol.vercel.app](https://career-up-indol.vercel.app)  
 **Backend Stack:** FastAPI (Python 3.11 / 3.14), SQLAlchemy ORM, Google Gemini GenAI SDK, PostgreSQL / SQLite, JWT Bearer Auth  
 **Backend Live Deployment:** [https://careerup-h35y.onrender.com](https://careerup-h35y.onrender.com) (Swagger UI: [`/docs`](https://careerup-h35y.onrender.com/docs))  
 **Cloud Storage & Database:** Supabase (PostgreSQL Transaction Pooler + S3 Storage Bucket `resumes`)  
@@ -124,7 +124,7 @@ CareerUp transforms static resumes into actionable, multidimensional career inte
 | **Frontend Production Build** | Vercel / Turbopack | ✅ Verified | **19/19 static routes compiled cleanly (0 TypeScript / Turbopack errors)**. |
 | **Audit PRD Fix Suite (Phases 1-4)** | Next.js 16 & FastAPI | ✅ Verified | All 11 loophole items resolved and verified end-to-end. |
 | **Live Cloud Backend Verification** | Render (`careerup-h35y`) | ✅ Verified | 18 of 18 REST endpoints operational (including DELETE /data and request-id middleware). |
-| **GitHub Deployment Sync** | GitHub (`main`) | ✅ Up to Date | Live on [careerup.vercel.app](https://careerup.vercel.app) via auto-deploy. |
+| **GitHub Deployment Sync** | GitHub (`main`) | ✅ Up to Date | Live on [career-up-indol.vercel.app](https://career-up-indol.vercel.app) via auto-deploy. |
 
 ---
 
