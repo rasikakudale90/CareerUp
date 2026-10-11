@@ -18,10 +18,6 @@ def get_current_user(
     )
     
     if not token:
-        # Default fallback to first student user if in demo mode
-        user = db.query(User).first()
-        if user:
-            return user
         raise credentials_exception
 
     payload = decode_access_token(token)
@@ -36,3 +32,19 @@ def get_current_user(
     if user is None:
         raise credentials_exception
     return user
+
+
+def get_optional_current_user(
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme)
+) -> User | None:
+    if not token:
+        return None
+    payload = decode_access_token(token)
+    if not payload:
+        return None
+    user_id = payload.get("sub")
+    if not user_id:
+        return None
+    return db.query(User).filter(User.id == user_id).first()
+
