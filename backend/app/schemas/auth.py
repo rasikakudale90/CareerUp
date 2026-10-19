@@ -27,3 +27,22 @@ class UserOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ForgotPasswordResponse(BaseModel):
+    message: str
+    email: str
+    reset_code: Optional[str] = None
+    expires_in_minutes: int = 15
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    reset_code: str
+    new_password: str
+
+class ResetPasswordResponse(BaseModel):
+    message: str
+    success: bool
+

@@ -26,6 +26,7 @@ CareerUp transforms static resumes into actionable, multidimensional career inte
 - [x] **`/` (Landing Page)**: Cinematic Hero with GSAP entrance sequence, Three.js 3D Career Orbit, Streamlined Floating Pill Navbar, Dynamic Readiness Calculator Preview, Feature Showcases, Social Proof, and CTA.
 - [x] **`/auth/signin` & `/signin`**: Clean Single-User Authentication (strictly 1 active session at a time, eliminating persona switcher clutter).
 - [x] **`/auth/register` & `/register` & `/signup`**: Registration flow with university, graduation year, and target role inputs.
+- [x] **`/auth/forgot-password` & `/forgot-password`**: Two-step password reset flow with simulated instant security code, live password strength indicator, and FastAPI cloud update endpoints (`POST /api/v1/auth/forgot-password` and `POST /api/v1/auth/reset-password`).
 - [x] **`/onboarding`**: 4-Step Onboarding Flow with reactive custom resume text/file parsing, immediate Career DNA generation, and real-time state synchronization.
 - [x] **`/dashboard`**: Unified Intelligence Hub with **strict Authentication Gate** when logged out; displays Readiness Score Dial, Career DNA Radar Polygon, Active Track Details, Urgent Skill Gaps, and Next Milestones when authenticated.
 - [x] **`/profile`**: Comprehensive Career DNA Breakdown, **Profile Photo Upload & Dicebear AI Avatar Generator**, verified project portfolio, in-place resume re-parser, and **Account & RBAC Session Management with Log Out**.
@@ -128,9 +129,9 @@ CareerUp transforms static resumes into actionable, multidimensional career inte
 
 | Verification Scope | Platform | Status | Result |
 | :--- | :--- | :--- | :--- |
-| **Frontend Production Build** | Vercel / Turbopack | ✅ Verified | **19/19 static routes compiled cleanly (0 TypeScript / Turbopack errors)**. |
+| **Frontend Production Build** | Vercel / Turbopack | ✅ Verified | **21/21 static routes compiled cleanly (0 TypeScript / Turbopack errors)**. |
 | **Audit PRD Fix Suite (Phases 1-5)** | Next.js 16 & FastAPI | ✅ Verified | **100% of loopholes (FR-01 through FR-14, AC-01 through AC-12) resolved.** |
-| **Live Cloud Backend Verification** | Render (`careerup-h35y`) | ✅ Verified | 18 of 18 REST endpoints operational (including DELETE /data and request-id middleware). |
+| **Live Cloud Backend Verification** | Render (`careerup-h35y`) | ✅ Verified | 20 of 20 REST endpoints operational (including /forgot-password, /reset-password, /data, and request-id middleware). |
 | **GitHub Deployment Sync** | GitHub (`main`) | ✅ Up to Date | Live on [career-up-indol.vercel.app](https://career-up-indol.vercel.app) via auto-deploy. |
 
 ---

@@ -140,6 +140,7 @@ interface PrototypeContextType {
   currentUser: AuthUser | null;
   signIn: (email: string, password?: string) => boolean;
   signUp: (data: SignUpData) => boolean;
+  resetPassword: (email: string, newPassword: string) => boolean;
   signOut: () => void;
   studentProfile: StudentProfile;
   setStudentProfile: React.Dispatch<React.SetStateAction<StudentProfile>>;
@@ -442,6 +443,24 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
       tasks: m.tasks.map((t) => ({ ...t, completed: false })),
     })));
     setIsAuthenticated(true);
+    return true;
+  };
+
+  const resetPassword = (email: string, newPassword: string) => {
+    const userEmail = email.trim();
+    if (!userEmail) return false;
+
+    const storageKey = `${LOCAL_STORAGE_BASE_KEY}_${userEmail.replace(/[^a-zA-Z0-9]/g, "_")}`;
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        parsed.savedPassword = newPassword;
+        localStorage.setItem(storageKey, JSON.stringify(parsed));
+      } catch (e) {
+        console.warn("Could not update local storage for user:", e);
+      }
+    }
     return true;
   };
 
@@ -1017,6 +1036,7 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
         currentUser,
         signIn,
         signUp,
+        resetPassword,
         signOut,
         studentProfile,
         setStudentProfile,

@@ -36,7 +36,7 @@
 
 ### B. Backend Architecture (FastAPI + Python)
 - **API Version:** `/api/v1` routes:
-  - `/auth`: User registration, JWT login, current user verification.
+  - `/auth`: User registration, JWT login, current user verification, `POST /forgot-password`, and `POST /reset-password`.
   - `/profile`: Candidate profile details, avatar updates, resume re-analysis, and `DELETE /api/v1/profile/data` (Right to be Forgotten).
   - `/career`: 6 target tracks, fit scores, and market dynamics.
   - `/skills`: Skill gap breakdown and missing evidence diagnostics.
@@ -51,21 +51,22 @@
 
 ---
 
-## 3. 🗺️ Route Directory (19/19 Verified Routes)
+## 3. 🗺️ Route Directory (21/21 Verified Routes)
 
 1. `/` — Cinematic Landing Hero with 3D Orbit, GSAP animations, Readiness Calculator, and Feature Showcase.
 2. `/auth/signin` & `/signin` — Clean Single-User Authentication (persona switcher clutter completely eliminated).
 3. `/auth/register`, `/register`, & `/signup` — Registration flow with university, degree, and target track.
-4. `/onboarding` — Multi-stage AI resume intake + **Step 2 Extracted Fact Review & Target Role Selection** (FR-02 & FR-05).
-5. `/dashboard` — Central Intelligence Hub with Readiness Dial, Career DNA Radar, Urgent Skill Gaps, and Active Roadmaps.
-6. `/career` — 6-Track Career Explorer (AI Product Engineer, Full-Stack AI, Applied ML, GenAI Fullstack, Distributed Systems, ML Ops).
-7. `/skill-gap` — Comprehensive Gap Analysis with dynamic blockers and **"Not Assessed (Evidence Not Found in Resume)"** labels (FR-06).
-8. `/roadmap` — 12-Week Milestone Action Plan with interactive checkboxes dynamically updating the readiness index.
-9. `/what-if` — Skill Acquisition Simulator with market benchmarks ($140k–$180k), salary lift projections, and 1-click roadmap commits (`verified: false`).
-10. `/job-match` — ATS Diagnostic Engine with full-page `JobMatchSkeleton`, true keyword overlap score, and custom JD analyzer.
-11. `/readiness` — Deep-dive readiness diagnostics with transparent 35/25/20/20 rubric and educational disclaimer.
-12. `/notifications` — Dedicated Career Intelligence Feed with instant read synchronization.
-13. `/profile` — Full Career DNA profile, custom image upload, Dicebear neural avatar generator, and **Data Deletion Danger Zone** (FR-13).
+4. `/auth/forgot-password` & `/forgot-password` — Multi-step security code verification and password reset flow with instant on-screen testing sandbox.
+5. `/onboarding` — Multi-stage AI resume intake + **Step 2 Extracted Fact Review & Target Role Selection** (FR-02 & FR-05).
+6. `/dashboard` — Central Intelligence Hub with Readiness Dial, Career DNA Radar, Urgent Skill Gaps, and Active Roadmaps.
+7. `/career` — 6-Track Career Explorer (AI Product Engineer, Full-Stack AI, Applied ML, GenAI Fullstack, Distributed Systems, ML Ops).
+8. `/skill-gap` — Comprehensive Gap Analysis with dynamic blockers and **"Not Assessed (Evidence Not Found in Resume)"** labels (FR-06).
+9. `/roadmap` — 12-Week Milestone Action Plan with interactive checkboxes dynamically updating the readiness index.
+10. `/what-if` — Skill Acquisition Simulator with market benchmarks ($140k–$180k), salary lift projections, and 1-click roadmap commits (`verified: false`).
+11. `/job-match` — ATS Diagnostic Engine with full-page `JobMatchSkeleton`, true keyword overlap score, and custom JD analyzer.
+12. `/readiness` — Deep-dive readiness diagnostics with transparent 35/25/20/20 rubric and educational disclaimer.
+13. `/notifications` — Dedicated Career Intelligence Feed with instant read synchronization.
+14. `/profile` — Full Career DNA profile, custom image upload, Dicebear neural avatar generator, and **Data Deletion Danger Zone** (FR-13).
 
 ---
 

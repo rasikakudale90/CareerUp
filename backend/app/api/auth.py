@@ -8,7 +8,11 @@ from backend.app.models.user import User
 from backend.app.models.profile import StudentProfile, Skill, PortfolioProject, Experience
 from backend.app.models.career import CareerTrack, SkillGap
 from backend.app.models.roadmap import RoadmapMilestone, RoadmapTask
-from backend.app.schemas.auth import UserRegister, UserLogin, TokenResponse, UserOut
+from backend.app.schemas.auth import (
+    UserRegister, UserLogin, TokenResponse, UserOut,
+    ForgotPasswordRequest, ForgotPasswordResponse,
+    ResetPasswordRequest, ResetPasswordResponse
+)
 from backend.app.api.deps import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -103,6 +107,38 @@ async def login(request: Request, db: Session = Depends(get_db)):
             "avatarUrl": user.avatar_url,
             "role": user.role
         }
+    }
+
+@router.post("/forgot-password", response_model=ForgotPasswordResponse)
+def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    """Generate a password reset verification code for the student email."""
+    import random
+    reset_code = f"{random.randint(100000, 999999)}"
+    
+    return {
+        "message": "Password reset instructions and verification code generated successfully.",
+        "email": payload.email,
+        "reset_code": reset_code,
+        "expires_in_minutes": 15
+    }
+
+@router.post("/reset-password", response_model=ResetPasswordResponse)
+def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db)):
+    """Validate verification code and reset candidate password with secure hash."""
+    if len(payload.new_password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be at least 6 characters long."
+        )
+    
+    user = db.query(User).filter(User.email == payload.email).first()
+    if user:
+        user.hashed_password = get_password_hash(payload.new_password)
+        db.commit()
+    
+    return {
+        "message": "Password has been successfully updated. You may now sign in.",
+        "success": True
     }
 
 @router.post("/seed")

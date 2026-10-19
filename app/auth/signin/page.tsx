@@ -88,7 +88,7 @@ export default function SignInPage() {
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-semibold text-[var(--text-secondary)]">Password</label>
-                  <a href="#" className="text-[11px] text-[var(--accent)] hover:underline">Forgot?</a>
+                  <Link href="/auth/forgot-password" className="text-[11px] text-[var(--accent)] hover:underline">Forgot?</Link>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />
