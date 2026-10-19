@@ -1,6 +1,6 @@
 # 🧠 CareerUp — Comprehensive Long-Term Repository Memory (Repo-Memory)
 
-> **Last Updated:** 2026-10-11  
+> **Last Updated:** 2026-10-19  
 > **Status:** Production-Ready & Deployed  
 > **Owner / Principal:** Rasika Babe (Rule #14)  
 > **Branch:** `main` (Up to date with `origin/main`)
@@ -91,8 +91,9 @@
 
 ## 5. 🛠️ Build & Deployment Verification Log
 
-- **Turbopack Production Build:** `npx next build` passes cleanly with **19/19 routes compiled (0 errors)**.
+- **Turbopack Production Build:** `npx next build` passes cleanly with **21/21 routes compiled (0 errors)**.
 - **Git Commit Log:**
+  - `2cccc7f`: `feat(auth): add forgot-password flow with instant code verification and backend reset endpoints`
   - `2f897dd`: `feat(audit): resolve all remaining loopholes from CareerUp_AI_Fix_PRD.md`
   - `a3f4218`: `docs: update production Vercel domain to career-up-indol.vercel.app and allow in backend CORS`
   - `dc7a4d3`: `feat(privacy): Phase 4 fix - account data & resume deletion workflow, Request-ID middleware, and updated progress repo-memory`

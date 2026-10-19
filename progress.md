@@ -8,7 +8,7 @@
 **Cloud Storage & Database:** Supabase (PostgreSQL Transaction Pooler + S3 Storage Bucket `resumes`)  
 **GitHub Repository:** [https://github.com/rasikakudale90/CareerUp](https://github.com/rasikakudale90/CareerUp)  
 **Permanent Repo-Memory:** [`REPO_MEMORY.md`](file:///e:/Ai%20career/REPO_MEMORY.md)  
-**Status Date:** 2026-10-11  
+**Status Date:** 2026-10-19  
 **Lead / Principal:** Rasika Babe  
 
 ---
@@ -122,6 +122,13 @@ CareerUp transforms static resumes into actionable, multidimensional career inte
    - Added Step 2 Extracted Fact Review & Target Role Selection modal in `/onboarding` (FR-02 & FR-05): allows candidate to review extracted facts, remove inaccurate skills, add missing skills, and select their target career track before entering the dashboard.
    - Updated Skill-Gap Analysis in `/skill-gap` (FR-06): missing resume evidence is now explicitly marked as "Not Assessed (Evidence Not Found in Resume)" instead of implying zero candidate capability.
    - 100% of all PRD Functional Requirements (FR-01 through FR-14) and Acceptance Criteria (AC-01 through AC-12) are now fully satisfied.
+
+6. **Phase 6: Auth Complete — Forgot Password & Recovery Engine (2026-10-19)**:
+   - Built dedicated routes: `/auth/forgot-password` and `/forgot-password` with 2-step verification and live password strength indicator.
+   - Replaced dead `#` Forgot link on `/auth/signin` with clean client navigation.
+   - Built instant on-screen sandbox verification code generator with 1-click Auto-Fill for friction-free evaluation.
+   - Added backend `POST /api/v1/auth/forgot-password` and `POST /api/v1/auth/reset-password` with bcrypt password hashing in FastAPI.
+   - Added `resetPassword(email, newPassword)` in `lib/prototype-state.tsx` for client-side multi-account state sync.
 
 ---
 
