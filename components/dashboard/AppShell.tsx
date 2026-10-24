@@ -81,8 +81,20 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
     router.push("/");
   };
 
+  // STRICT AUTH GUARD: While loading session, show clean neutral loading state to prevent data leakage
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 border-[var(--accent)] border-t-transparent animate-spin" />
+          <span className="text-xs text-[var(--text-muted)] font-medium">Verifying Session...</span>
+        </div>
+      </div>
+    );
+  }
+
   // STRICT AUTH GUARD: If user is not authenticated, do not show private candidate dashboard/data!
-  if (isLoaded && !isAuthenticated) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex flex-col relative overflow-hidden">
         {/* ATMOSPHERIC BACKGROUND */}
@@ -215,13 +227,13 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={studentProfile.avatarUrl}
-              alt={studentProfile.name}
+              src={currentUser?.avatarUrl || studentProfile.avatarUrl}
+              alt={currentUser?.name || studentProfile.name}
               className="w-9 h-9 rounded-full object-cover border border-[var(--accent)]"
             />
             <div className="flex flex-col min-w-0 flex-1">
               <span className="text-xs font-semibold text-[var(--text-primary)] truncate group-hover:text-[var(--accent)] transition-colors">
-                {studentProfile.name}
+                {currentUser?.name || studentProfile.name}
               </span>
               <span className="text-[10px] text-[var(--text-secondary)] truncate">{studentProfile.title}</span>
             </div>
@@ -323,8 +335,8 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
             <Link href="/profile" className="hover:scale-110 active:scale-95 transition-transform" title="My Profile">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={studentProfile.avatarUrl}
-                alt={studentProfile.name}
+                src={currentUser?.avatarUrl || studentProfile.avatarUrl}
+                alt={currentUser?.name || studentProfile.name}
                 className="w-8 h-8 rounded-full object-cover border-2 border-[var(--accent)] shadow-md"
               />
             </Link>

@@ -24,7 +24,10 @@
 - **App Router:** 19 statically prerendered and dynamic routes under `/app`.
 - **Styling & Motion:** Tailwind CSS, CSS Variables design tokens, GSAP + ScrollTrigger, Lenis smooth scroll, Three.js 3D career orbit, Framer Motion.
 - **State Engine (`lib/prototype-state.tsx`):**
-  - Multi-account scoped storage key: `careerup_state_v4_<user_email>`.
+  - **Strict Guest State Default:** When any user opens the web app link, `isAuthenticated` defaults to `false` and `currentUser` to `null`. Visitors see a clean visitor navbar ("Sign In" / "Upload Resume") and a neutral preview ("Future Engineer 👋") with zero exposure of prior logins or candidate data.
+  - **Protected Dashboard Gate:** All private routes (`/dashboard`, `/career`, `/skill-gap`, `/roadmap`, `/what-if`, `/job-match`, `/readiness`, `/notifications`, `/profile`) block unauthenticated visitors behind the Protected Career Center card.
+  - **Isolated User Storage Key:** Scoped per user email (`careerup_state_v4_<user_email>`). Signing in or registering loads only that user's verified profile, skills, roadmap, and state.
+  - **Clean Sign-Out:** Removing `careerup_active_user` and resetting in-memory state cleanly on logout or account data wipe.
   - Seamless synchronization across 6 core systems:
     1. Resume Ingestion & Parsing
     2. 5D Career DNA Radar Matrix
@@ -32,7 +35,6 @@
     4. Skill-Gap Diagnostic Engine
     5. Interactive 12-Week Roadmap
     6. ATS Compatibility & Job Matching Engine
-  - Strict authentication gate protecting private dashboard and candidate data.
 
 ### B. Backend Architecture (FastAPI + Python)
 - **API Version:** `/api/v1` routes:

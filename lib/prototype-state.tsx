@@ -203,7 +203,7 @@ export function getTimeBasedGreeting(): string {
 export function PrototypeProvider({ children }: { children: ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [greeting, setGreeting] = useState<string>("Good day");
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [hasUploadedResume, setHasUploadedResume] = useState<boolean>(false);
 
   // Update greeting based on client-side time
@@ -215,14 +215,7 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval);
   }, []);
 
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>({
-    id: INITIAL_STUDENT_PROFILE.id,
-    name: INITIAL_STUDENT_PROFILE.name,
-    email: "student@careerup.ai",
-    avatarUrl: INITIAL_STUDENT_PROFILE.avatarUrl,
-    role: "student",
-  });
-
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(INITIAL_STUDENT_PROFILE);
   const [careerPaths, setCareerPaths] = useState<CareerPath[]>(CAREER_PATHS);
   const [selectedCareerId, setSelectedCareerId] = useState<string>(CAREER_PATHS[0].id);
@@ -240,7 +233,7 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
 
   // Helper to get storage key scoped to current user email
   const getUserStorageKey = (email?: string) => {
-    const userEmail = email || currentUser?.email || "default";
+    const userEmail = email || currentUser?.email || "guest";
     return `${LOCAL_STORAGE_BASE_KEY}_${userEmail.replace(/[^a-zA-Z0-9]/g, "_")}`;
   };
 
@@ -249,84 +242,94 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
     try {
       // Check for active user session first
       const sessionUserStr = localStorage.getItem("careerup_active_user");
-      let activeEmail = "student@careerup.ai";
       if (sessionUserStr) {
         const sessionUser = JSON.parse(sessionUserStr);
-        if (sessionUser?.email) activeEmail = sessionUser.email;
-      }
-
-      const storageKey = `${LOCAL_STORAGE_BASE_KEY}_${activeEmail.replace(/[^a-zA-Z0-9]/g, "_")}`;
-      const saved = localStorage.getItem(storageKey) || localStorage.getItem("careerup_state_v3");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (typeof parsed.isAuthenticated === "boolean") {
-          setIsAuthenticated(parsed.isAuthenticated);
+        if (sessionUser && sessionUser.email) {
+          const storageKey = `${LOCAL_STORAGE_BASE_KEY}_${sessionUser.email.replace(/[^a-zA-Z0-9]/g, "_")}`;
+          const saved = localStorage.getItem(storageKey);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            setIsAuthenticated(true);
+            setCurrentUser(parsed.currentUser || sessionUser);
+            if (typeof parsed.hasUploadedResume === "boolean") {
+              setHasUploadedResume(parsed.hasUploadedResume);
+            }
+            if (parsed.studentProfile) {
+              setStudentProfile(parsed.studentProfile);
+            }
+            if (parsed.selectedCareerId) {
+              setSelectedCareerId(parsed.selectedCareerId);
+            }
+            if (parsed.careerPaths && Array.isArray(parsed.careerPaths)) {
+              setCareerPaths(parsed.careerPaths);
+            }
+            if (parsed.skillGaps && Array.isArray(parsed.skillGaps)) {
+              setSkillGaps(parsed.skillGaps);
+            }
+            if (parsed.roadmap && Array.isArray(parsed.roadmap)) {
+              setRoadmap(parsed.roadmap);
+            }
+            if (parsed.activeSimSkillIds && Array.isArray(parsed.activeSimSkillIds)) {
+              setActiveSimSkillIds(parsed.activeSimSkillIds);
+            }
+            if (parsed.customSimulatedSkills && Array.isArray(parsed.customSimulatedSkills)) {
+              setCustomSimulatedSkills(parsed.customSimulatedSkills);
+            }
+            if (parsed.jobMatches && Array.isArray(parsed.jobMatches)) {
+              setJobMatches(parsed.jobMatches);
+            }
+            if (parsed.notifications && Array.isArray(parsed.notifications)) {
+              setNotifications(parsed.notifications);
+            }
+          } else {
+            setIsAuthenticated(true);
+            setCurrentUser(sessionUser);
+          }
+        } else {
+          setIsAuthenticated(false);
+          setCurrentUser(null);
+          localStorage.removeItem("careerup_active_user");
         }
-        if (typeof parsed.hasUploadedResume === "boolean") {
-          setHasUploadedResume(parsed.hasUploadedResume);
-        }
-        if (parsed.currentUser !== undefined) {
-          setCurrentUser(parsed.currentUser);
-        }
-        if (parsed.studentProfile) {
-          setStudentProfile(parsed.studentProfile);
-        }
-        if (parsed.selectedCareerId) {
-          setSelectedCareerId(parsed.selectedCareerId);
-        }
-        if (parsed.careerPaths && Array.isArray(parsed.careerPaths)) {
-          setCareerPaths(parsed.careerPaths);
-        }
-        if (parsed.skillGaps && Array.isArray(parsed.skillGaps)) {
-          setSkillGaps(parsed.skillGaps);
-        }
-        if (parsed.roadmap && Array.isArray(parsed.roadmap)) {
-          setRoadmap(parsed.roadmap);
-        }
-        if (parsed.activeSimSkillIds && Array.isArray(parsed.activeSimSkillIds)) {
-          setActiveSimSkillIds(parsed.activeSimSkillIds);
-        }
-        if (parsed.customSimulatedSkills && Array.isArray(parsed.customSimulatedSkills)) {
-          setCustomSimulatedSkills(parsed.customSimulatedSkills);
-        }
-        if (parsed.jobMatches && Array.isArray(parsed.jobMatches)) {
-          setJobMatches(parsed.jobMatches);
-        }
-        if (parsed.notifications && Array.isArray(parsed.notifications)) {
-          setNotifications(parsed.notifications);
-        }
+      } else {
+        // No active user logged in - strict unauthenticated / guest visitor state
+        setIsAuthenticated(false);
+        setCurrentUser(null);
       }
     } catch (e) {
       console.warn("Could not load stored prototype state:", e);
+      setIsAuthenticated(false);
+      setCurrentUser(null);
     } finally {
       setIsLoaded(true);
     }
   }, []);
 
-  // Save to LocalStorage whenever state changes
+  // Save to LocalStorage whenever state changes for an authenticated user
   useEffect(() => {
     if (!isLoaded) return;
     try {
-      const storageKey = getUserStorageKey();
-      localStorage.setItem(
-        storageKey,
-        JSON.stringify({
-          isAuthenticated,
-          hasUploadedResume,
-          currentUser,
-          studentProfile,
-          selectedCareerId,
-          careerPaths,
-          skillGaps,
-          roadmap,
-          activeSimSkillIds,
-          customSimulatedSkills,
-          jobMatches,
-          notifications,
-        })
-      );
-      if (currentUser) {
+      if (isAuthenticated && currentUser && currentUser.email) {
+        const storageKey = getUserStorageKey(currentUser.email);
+        localStorage.setItem(
+          storageKey,
+          JSON.stringify({
+            isAuthenticated: true,
+            hasUploadedResume,
+            currentUser,
+            studentProfile,
+            selectedCareerId,
+            careerPaths,
+            skillGaps,
+            roadmap,
+            activeSimSkillIds,
+            customSimulatedSkills,
+            jobMatches,
+            notifications,
+          })
+        );
         localStorage.setItem("careerup_active_user", JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem("careerup_active_user");
       }
     } catch (e) {
       console.warn("Could not save prototype state:", e);
@@ -351,7 +354,9 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
 
   // Strictly ONE Single User Sign-In with isolated account state (Addresses Bug 4)
   const signIn = (email: string, password?: string) => {
-    const userEmail = email.trim() || "student@careerup.ai";
+    const userEmail = email.trim().toLowerCase();
+    if (!userEmail) return false;
+
     const userName = userEmail.includes("@")
       ? userEmail.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
       : "Student Candidate";
@@ -362,45 +367,51 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
     if (savedUserSession) {
       try {
         const parsed = JSON.parse(savedUserSession);
-        setIsAuthenticated(true);
-        setHasUploadedResume(!!parsed.hasUploadedResume);
-        setCurrentUser(parsed.currentUser || {
+        const userObj: AuthUser = parsed.currentUser || {
           id: `user-${Date.now()}`,
           name: userName,
           email: userEmail,
           avatarUrl: getAIAvatarUrl(userName),
           role: "student",
-        });
+        };
+        setIsAuthenticated(true);
+        setHasUploadedResume(!!parsed.hasUploadedResume);
+        setCurrentUser(userObj);
+        localStorage.setItem("careerup_active_user", JSON.stringify(userObj));
         if (parsed.studentProfile) setStudentProfile(parsed.studentProfile);
         if (parsed.careerPaths) setCareerPaths(parsed.careerPaths);
+        if (parsed.selectedCareerId) setSelectedCareerId(parsed.selectedCareerId);
         if (parsed.skillGaps) setSkillGaps(parsed.skillGaps);
         if (parsed.roadmap) setRoadmap(parsed.roadmap);
         if (parsed.jobMatches) setJobMatches(parsed.jobMatches);
         if (parsed.customSimulatedSkills) setCustomSimulatedSkills(parsed.customSimulatedSkills);
         if (parsed.activeSimSkillIds) setActiveSimSkillIds(parsed.activeSimSkillIds);
+        if (parsed.notifications) setNotifications(parsed.notifications);
         return true;
       } catch (e) {
         console.warn("Error restoring session:", e);
       }
     }
 
-    // New account session initialization
-    const userProfile: StudentProfile = {
-      ...INITIAL_STUDENT_PROFILE,
+    // New account session initialization for this specific user
+    const userObj: AuthUser = {
       id: `user-${Date.now()}`,
       name: userName,
+      email: userEmail,
       avatarUrl: getAIAvatarUrl(userName),
+      role: "student",
+    };
+    const userProfile: StudentProfile = {
+      ...INITIAL_STUDENT_PROFILE,
+      id: userObj.id,
+      name: userName,
+      avatarUrl: userObj.avatarUrl,
       summary: `Welcome ${userName}! Upload your resume to calibrate your true Career DNA.`,
     };
 
     setStudentProfile(userProfile);
-    setCurrentUser({
-      id: userProfile.id,
-      name: userName,
-      email: userEmail,
-      avatarUrl: userProfile.avatarUrl,
-      role: "student",
-    });
+    setCurrentUser(userObj);
+    localStorage.setItem("careerup_active_user", JSON.stringify(userObj));
     setHasUploadedResume(false);
     setActiveSimSkillIds([]);
     setCustomSimulatedSkills([]);
@@ -414,10 +425,19 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = (data: SignUpData) => {
+    const userEmail = data.email.trim().toLowerCase();
     const avatar = getAIAvatarUrl(data.name);
+    const userId = `student-${Date.now()}`;
+    const userObj: AuthUser = {
+      id: userId,
+      name: data.name,
+      email: userEmail,
+      avatarUrl: avatar,
+      role: "student",
+    };
     const newProfile: StudentProfile = {
       ...INITIAL_STUDENT_PROFILE,
-      id: `student-${Date.now()}`,
+      id: userId,
       name: data.name,
       avatarUrl: avatar,
       university: data.university || "Global University",
@@ -427,13 +447,8 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
     };
 
     setStudentProfile(newProfile);
-    setCurrentUser({
-      id: newProfile.id,
-      name: data.name,
-      email: data.email,
-      avatarUrl: avatar,
-      role: "student",
-    });
+    setCurrentUser(userObj);
+    localStorage.setItem("careerup_active_user", JSON.stringify(userObj));
     setHasUploadedResume(false);
     setActiveSimSkillIds([]);
     setCustomSimulatedSkills([]);
@@ -447,7 +462,7 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
   };
 
   const resetPassword = (email: string, newPassword: string) => {
-    const userEmail = email.trim();
+    const userEmail = email.trim().toLowerCase();
     if (!userEmail) return false;
 
     const storageKey = `${LOCAL_STORAGE_BASE_KEY}_${userEmail.replace(/[^a-zA-Z0-9]/g, "_")}`;
@@ -467,7 +482,17 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
   const signOut = () => {
     setIsAuthenticated(false);
     setCurrentUser(null);
-    localStorage.removeItem("careerup_active_user");
+    setHasUploadedResume(false);
+    setStudentProfile(INITIAL_STUDENT_PROFILE);
+    setRoadmap(INITIAL_ROADMAP.map((m) => ({
+      ...m,
+      tasks: m.tasks.map((t) => ({ ...t, completed: false })),
+    })));
+    setActiveSimSkillIds([]);
+    setCustomSimulatedSkills([]);
+    try {
+      localStorage.removeItem("careerup_active_user");
+    } catch {}
   };
 
   // Avatar Management
@@ -619,13 +644,15 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
       };
 
       if (parsed.name) {
+        const candidateEmail = `${parsed.name.toLowerCase().replace(/[^a-z0-9]/g, "")}@candidate.careerup.ai`;
         setCurrentUser((u) => (u ? { ...u, name: parsed.name! } : {
           id: updated.id,
           name: parsed.name!,
-          email: "student@careerup.ai",
+          email: candidateEmail,
           avatarUrl: updated.avatarUrl || getAIAvatarUrl(parsed.name!),
           role: "student",
         }));
+        setIsAuthenticated(true);
       }
 
       return updated;
@@ -948,15 +975,9 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
 
   const resetState = () => {
     setStudentProfile(INITIAL_STUDENT_PROFILE);
-    setCurrentUser({
-      id: INITIAL_STUDENT_PROFILE.id,
-      name: INITIAL_STUDENT_PROFILE.name,
-      email: "student@careerup.ai",
-      avatarUrl: INITIAL_STUDENT_PROFILE.avatarUrl,
-      role: "student",
-    });
+    setCurrentUser(null);
     setHasUploadedResume(false);
-    setIsAuthenticated(true);
+    setIsAuthenticated(false);
     setSelectedCareerId(CAREER_PATHS[0].id);
     setCareerPaths(CAREER_PATHS);
     setSkillGaps(SKILL_GAPS);
@@ -974,8 +995,10 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
       }))
     );
     try {
-      const storageKey = getUserStorageKey();
-      localStorage.removeItem(storageKey);
+      if (currentUser?.email) {
+        const storageKey = getUserStorageKey(currentUser.email);
+        localStorage.removeItem(storageKey);
+      }
       localStorage.removeItem("careerup_active_user");
     } catch {
       // ignore
@@ -983,12 +1006,19 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteAllUserData = async () => {
+    const currentEmail = currentUser?.email;
     try {
       const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || "https://careerup-h35y.onrender.com";
       const apiBase = rawApiUrl.endsWith("/api/v1") ? rawApiUrl : `${rawApiUrl.replace(/\/$/, "")}/api/v1`;
       await fetch(`${apiBase}/profile/data`, { method: "DELETE" }).catch(() => {});
     } catch {}
 
+    if (currentEmail) {
+      try {
+        const storageKey = getUserStorageKey(currentEmail);
+        localStorage.removeItem(storageKey);
+      } catch {}
+    }
     resetState();
     setHasUploadedResume(false);
   };

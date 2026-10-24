@@ -25,7 +25,7 @@ import { SpotlightCard } from "@/components/motion/SpotlightCard";
 import { usePrototype } from "@/lib/prototype-state";
 
 export default function LandingPage() {
-  const { studentProfile, careerPaths, overallReadinessScore, roadmap, greeting } = usePrototype();
+  const { studentProfile, careerPaths, overallReadinessScore, roadmap, greeting, isAuthenticated, currentUser } = usePrototype();
   const heroRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const subheadRef = useRef<HTMLParagraphElement>(null);
@@ -387,10 +387,10 @@ export default function LandingPage() {
               </h2>
             </div>
             <Link
-              href="/dashboard"
+              href={isAuthenticated ? "/dashboard" : "/auth/signin"}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--accent)] text-white text-xs font-semibold hover:bg-[var(--accent-hover)] transition-all hover:scale-105 shadow-xl self-start md:self-auto"
             >
-              <span>Launch Live Dashboard</span>
+              <span>{isAuthenticated ? "Launch Live Dashboard" : "Sign In to Your Dashboard"}</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
@@ -401,16 +401,30 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-[var(--border-color)] gap-4">
               <div>
                 <div suppressHydrationWarning className="text-lg sm:text-xl font-bold text-[var(--text-primary)] flex items-center gap-2">
-                  {greeting}, {studentProfile.name.split(" ")[0]} 👋
+                  {isAuthenticated && currentUser ? (
+                    <span>{greeting}, {currentUser.name.split(" ")[0]} 👋</span>
+                  ) : (
+                    <span>{greeting}, Future Engineer 👋</span>
+                  )}
                 </div>
-                <div className="text-xs text-[var(--text-secondary)]">Your future is full of possibilities. Let&apos;s explore.</div>
+                <div className="text-xs text-[var(--text-secondary)]">
+                  {isAuthenticated && currentUser
+                    ? "Your personalized career command center is active."
+                    : "Interactive Preview • Sign in to calibrate your personalized Career DNA."}
+                </div>
               </div>
 
               <div className="flex items-center gap-2">
                 <span className="text-xs text-[var(--text-secondary)]">Career Readiness:</span>
-                <span className="px-3 py-1 rounded-full bg-[var(--accent)]/15 border border-[var(--accent)]/40 text-[var(--accent)] font-bold text-xs shimmer-badge">
-                  {overallReadinessScore}% Verified
-                </span>
+                {isAuthenticated && currentUser ? (
+                  <span className="px-3 py-1 rounded-full bg-[var(--accent)]/15 border border-[var(--accent)]/40 text-[var(--accent)] font-bold text-xs shimmer-badge">
+                    {overallReadinessScore}% Verified
+                  </span>
+                ) : (
+                  <span className="px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-500 font-bold text-xs">
+                    Sample Baseline Preview
+                  </span>
+                )}
               </div>
             </div>
 

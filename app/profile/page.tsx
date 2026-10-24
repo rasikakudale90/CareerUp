@@ -394,7 +394,7 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
             <div className="p-4 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] space-y-1">
               <span className="text-[10px] uppercase font-bold text-[var(--text-muted)] block">Signed In As</span>
-              <span className="text-xs font-bold text-[var(--text-primary)] block truncate">{currentUser?.email || "student@careerup.ai"}</span>
+              <span className="text-xs font-bold text-[var(--text-primary)] block truncate">{currentUser?.email || "candidate@careerup.ai"}</span>
               <span className="text-[10px] text-[var(--text-secondary)]">Role: {currentUser?.role || "student"}</span>
             </div>
 

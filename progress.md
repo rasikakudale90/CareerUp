@@ -130,6 +130,13 @@ CareerUp transforms static resumes into actionable, multidimensional career inte
    - Added backend `POST /api/v1/auth/forgot-password` and `POST /api/v1/auth/reset-password` with bcrypt password hashing in FastAPI.
    - Added `resetPassword(email, newPassword)` in `lib/prototype-state.tsx` for client-side multi-account state sync.
 
+7. **Phase 7: Strict Visitor Privacy & User Data Isolation (2026-10-24)**:
+   - **Default Guest/Unauthenticated State:** Whenever any user opens the web-app link fresh, they start in a clean unauthenticated visitor state (`isAuthenticated = false`, `currentUser = null`).
+   - **Zero Data Exposure for Guests:** In the Navbar, visitors see "Sign In" and "Upload Resume" (no user avatar, name, or notifications). On the landing page, the preview displays a neutral greeting ("Future Engineer 👋") and "Sample Baseline Preview" badge with zero exposure of prior candidate accounts.
+   - **Protected Route Enforcement:** Navigating to `/dashboard`, `/profile`, `/roadmap`, `/skill-gap`, etc. as an unauthenticated guest presents the Protected Career Center prompting for sign-in or registration. Loading state eliminates any hydration flicker.
+   - **Strict Per-User Scoped Data:** Signing in (`signIn`) or registering (`signUp`) persists state strictly under `careerup_state_v4_<user_email>`. Each candidate sees only their own data.
+   - **Clean Sign-Out:** Signing out (`signOut`) removes `careerup_active_user` from `localStorage` and resets in-memory profile state so no candidate data persists across sessions.
+
 ---
 
 ## 📊 Verification & Deployment Matrix
