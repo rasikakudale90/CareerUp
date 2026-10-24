@@ -20,6 +20,8 @@ import {
   Lock,
   ArrowRight,
   ShieldAlert,
+  Menu,
+  X,
 } from "lucide-react";
 import { usePrototype } from "@/lib/prototype-state";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -49,6 +51,7 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
   } = usePrototype();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   const menuItems = [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -154,7 +157,7 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex relative overflow-hidden selection:bg-[var(--accent)] selection:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex relative selection:bg-[var(--accent)] selection:text-white transition-colors duration-300">
       {/* ATMOSPHERIC BACKGROUND (career1.png) WITH DYNAMIC THEME OVERLAY */}
       <div className="fixed inset-0 pointer-events-none z-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -168,8 +171,8 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--accent-soft),transparent_50%)]" />
       </div>
 
-      {/* Left Sidebar */}
-      <aside className="w-64 border-r border-[var(--border-color)] bg-[var(--bg-secondary)]/90 backdrop-blur-2xl flex flex-col justify-between hidden md:flex shrink-0 relative z-20 transition-colors duration-300">
+      {/* Left Sidebar (Sticky & Fixed: stays permanently in view while page content scrolls) */}
+      <aside className="w-64 border-r border-[var(--border-color)] bg-[var(--bg-secondary)]/90 backdrop-blur-2xl flex flex-col justify-between hidden md:flex shrink-0 sticky top-0 h-screen z-20 overflow-y-auto no-scrollbar transition-colors duration-300">
         <div>
           {/* Logo: CareerUp */}
           <div className="p-6 border-b border-[var(--border-subtle)]">
@@ -273,7 +276,17 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
       <div className="flex-1 flex flex-col min-w-0 relative z-10">
         {/* Top Header Bar */}
         <header className="h-16 border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/85 backdrop-blur-2xl px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 transition-colors duration-300">
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2.5 sm:gap-4">
+            {/* Mobile Left Hamburger Menu Toggle */}
+            <button
+              onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
+              className="md:hidden p-2 rounded-xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent)] transition-all shrink-0"
+              title="Open Navigation Menu"
+              aria-label="Toggle navigation menu"
+            >
+              {mobileDrawerOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            </button>
+
             {/* Mobile Home link */}
             <Link href="/" className="md:hidden flex items-center gap-2">
               <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--accent)] text-white">
@@ -384,6 +397,103 @@ export function AppShell({ children, headerTitle, headerSubtitle }: AppShellProp
         {/* Page Content Container with Mobile-First Padding */}
         <main className="flex-1 p-3.5 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">{children}</main>
       </div>
+
+      {/* Mobile Slide-Out Sidebar Drawer (Fixed & Isolated from page scroll) */}
+      {mobileDrawerOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          {/* Backdrop Overlay */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setMobileDrawerOpen(false)}
+          />
+          {/* Drawer Menu Panel */}
+          <div className="relative w-72 max-w-[85vw] h-full bg-[var(--bg-secondary)] border-r border-[var(--border-color)] p-4 flex flex-col justify-between shadow-2xl z-10 animate-in slide-in-from-left duration-200 overflow-y-auto">
+            <div>
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)]">
+                <Link href="/" onClick={() => setMobileDrawerOpen(false)} className="flex items-center gap-2.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-lg">
+                    <Sparkles className="h-4 w-4" />
+                  </div>
+                  <span className="font-bold text-base tracking-tight text-[var(--text-primary)] flex items-center gap-1.5">
+                    CareerUp
+                    <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/20">
+                      AI
+                    </span>
+                  </span>
+                </Link>
+                <button
+                  onClick={() => setMobileDrawerOpen(false)}
+                  className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                  aria-label="Close menu"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Nav List */}
+              <nav className="py-4 space-y-1.5">
+                {menuItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileDrawerOpen(false)}
+                      className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-medium transition-all ${
+                        isActive
+                          ? "bg-[var(--accent-soft)] text-[var(--text-primary)] font-bold border border-[var(--accent)]/30 shadow-md"
+                          : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card-subtle)]"
+                      }`}
+                    >
+                      <Icon className={`h-4 w-4 ${isActive ? "text-[var(--accent)]" : "text-[var(--text-secondary)]"}`} />
+                      <span>{item.label}</span>
+                      {item.badge !== undefined && item.badge > 0 && (
+                        <span className="ml-auto px-1.5 py-0.5 rounded-full bg-[var(--accent)] text-white text-[10px] font-bold">
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+
+            {/* Bottom Student Profile Card */}
+            <div className="pt-4 border-t border-[var(--border-color)] space-y-3">
+              <Link
+                href="/profile"
+                onClick={() => setMobileDrawerOpen(false)}
+                className="flex items-center gap-3 p-2 rounded-2xl hover:bg-[var(--bg-card-subtle)] transition-colors"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={currentUser?.avatarUrl || studentProfile.avatarUrl}
+                  alt={currentUser?.name || studentProfile.name}
+                  className="w-9 h-9 rounded-full object-cover border border-[var(--accent)]"
+                />
+                <div className="flex flex-col min-w-0 flex-1">
+                  <span className="text-xs font-semibold text-[var(--text-primary)] truncate">
+                    {currentUser?.name || studentProfile.name}
+                  </span>
+                  <span className="text-[10px] text-[var(--text-secondary)] truncate">{studentProfile.title}</span>
+                </div>
+              </Link>
+              <button
+                onClick={() => {
+                  setMobileDrawerOpen(false);
+                  handleSignOut();
+                }}
+                className="w-full py-2.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-500 text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Log Out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

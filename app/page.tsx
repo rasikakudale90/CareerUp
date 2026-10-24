@@ -67,8 +67,13 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex flex-col selection:bg-[var(--accent)] selection:text-white transition-colors duration-300">
+      {/* Sticky Top Floating Navbar (Stays fixed at top when scrolling) */}
+      <div className="sticky top-0 z-50 w-full pointer-events-auto">
+        <Navbar />
+      </div>
+
       {/* 1. CINEMATIC HERO SECTION WITH VIVID CAREER1.PNG LANDSCAPE */}
-      <section ref={heroRef} className="relative min-h-[92vh] flex flex-col justify-between overflow-hidden text-white">
+      <section ref={heroRef} className="relative min-h-[92vh] flex flex-col justify-between overflow-hidden text-white -mt-[72px] pt-[72px]">
         {/* Full-bleed high-res landscape backdrop (career1.png) */}
         <div className="absolute inset-0 z-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -80,11 +85,6 @@ export default function LandingPage() {
           {/* Subtle dark tint gradient to ensure crisp typography contrast */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/35 to-[var(--bg-primary)]/95" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(0,0,0,0.6)_100%)]" />
-        </div>
-
-        {/* Top Floating Navbar inside Hero */}
-        <div className="relative z-30">
-          <Navbar />
         </div>
 
         {/* Center Hero Content */}

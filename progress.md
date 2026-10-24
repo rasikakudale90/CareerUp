@@ -137,6 +137,12 @@ CareerUp transforms static resumes into actionable, multidimensional career inte
    - **Strict Per-User Scoped Data:** Signing in (`signIn`) or registering (`signUp`) persists state strictly under `careerup_state_v4_<user_email>`. Each candidate sees only their own data.
    - **Clean Sign-Out:** Signing out (`signOut`) removes `careerup_active_user` from `localStorage` and resets in-memory profile state so no candidate data persists across sessions.
 
+8. **Phase 8: Sticky Fixed Left Navigation & Mobile Hamburger Architecture (2026-10-24)**:
+   - **Sticky Desktop Navigation:** Pinned desktop `<aside>` sidebar (`sticky top-0 h-screen z-20 overflow-y-auto no-scrollbar`) so it remains stationary while the page content in `<main>` scrolls up and down independently.
+   - **Fixed Mobile Hamburger Menu:** Added a dedicated left-aligned mobile menu button (`md:hidden`) in the sticky top header (`sticky top-0 z-30`). The hamburger button stays firmly in place regardless of page scroll distance.
+   - **Slide-Out Mobile Drawer:** Integrated a slide-out drawer navigation modal (`fixed inset-0 z-50`) with an overlay backdrop, guaranteeing seamless mobile navigation isolated from page scrolling.
+   - **Landing Page Navbar Stickiness:** Moved `<Navbar />` into a top-level sticky container (`sticky top-0 z-50`) with negative margin offset, keeping the header fixed at the top of the viewport when scrolling down landing page content.
+
 ---
 
 ## 📊 Verification & Deployment Matrix
